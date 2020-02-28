@@ -20,7 +20,7 @@
 
         .media {
             position: relative;
-            width: 90vw;
+            width: 50vw;
             user-select: none;
         }
 
@@ -50,6 +50,12 @@
             cursor: pointer;
         }
 
+        @media screen and (max-width: 600px){
+            .media {
+                width: 90vw;
+            }
+        }
+
     </style>
 
 </head>
@@ -68,12 +74,11 @@
     <footer class="footer">footer</footer>
 </main>
 
-<script src="../libs/glide.js"></script>
 
 
 <script type="module">
 
-    import {Shifter} from "./Shifter.js";
+    import {Shifter} from "./libs/Shifter.js";
 
 
 

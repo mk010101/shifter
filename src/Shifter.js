@@ -1,6 +1,7 @@
 import {Dispatcher} from "./Dispatcher.js";
 
 
+
 class Shifter extends Dispatcher {
 
     /**
@@ -77,15 +78,17 @@ class Shifter extends Dispatcher {
 
         if ("PointerEvent" in window) {
 
-            this._down = this._down.bind(this);
-            this._move = this._move.bind(this);
-            this._up = this._up.bind(this);
+            this._pointerDown = this._pointerDown.bind(this);
+            this._pointerMove = this._pointerMove.bind(this);
+            this._pointerUp = this._pointerUp.bind(this);
+            this._pointerCancelled = this._pointerCancelled.bind(this);
             this._dispatchEnd = this._dispatchEnd.bind(this);
 
-            this._target.addEventListener("pointerdown", this._down);
-            window.addEventListener("pointerup", this._up);
-            window.addEventListener("pointercancel", (e)=> {console.log("cancel")}, {passive: this._isPassiveEvt});
-            window.addEventListener("pointerout", (e)=> {console.log("out")}, {passive: this._isPassiveEvt});
+            this._target.addEventListener("pointerdown", this._pointerDown);
+            window.addEventListener("pointerup", this._pointerUp);
+            window.addEventListener("pointercancel", this._pointerCancelled);
+            //window.addEventListener("pointercancel", (e)=> {console.log("cancel")}, {passive: this._isPassiveEvt});
+            //window.addEventListener("pointerout", (e)=> {console.log("out")}, {passive: this._isPassiveEvt});
 
         } else {
             throw ("Pointer events are not supported on your device.");
@@ -148,9 +151,9 @@ class Shifter extends Dispatcher {
     remove(keepCSS = true) {
 
         this._target.removeEventListener("wheel", this._wheelZoom);
-        this._target.removeEventListener("pointermove", this._move);
-        this._target.removeEventListener("pointerdown", this._down);
-        window.removeEventListener("pointerup", this._up);
+        this._target.removeEventListener("pointermove", this._pointerMove);
+        this._target.removeEventListener("pointerdown", this._pointerDown);
+        window.removeEventListener("pointerup", this._pointerUp);
         this._unlockScroll();
         this._target = null;
         this.offAll();
@@ -164,7 +167,7 @@ class Shifter extends Dispatcher {
      =================================================================================================================*/
 
 
-    _down(e) {
+    _pointerDown(e) {
 
         if (this._disabled) return;
 
@@ -172,7 +175,7 @@ class Shifter extends Dispatcher {
 
         this._speedX = 0;
         this._speedY = 0;
-        this._minMovedDist = 5;
+        this._minMovedDist = 10;
 
         if (this._disabled) return;
 
@@ -196,12 +199,13 @@ class Shifter extends Dispatcher {
 
         this._gestureStrartTime = Date.now();
 
-        this._target.addEventListener("pointermove", this._move, {passive: this._isPassiveEvt});
+        this._target.addEventListener("pointermove", this._pointerMove, {passive: this._isPassiveEvt});
         this.dispatch(Shifter.Evt.START, e);
 
     }
 
-    _move(e) {
+
+    _pointerMove(e) {
         if (this._disabled) return;
 
 
@@ -234,7 +238,7 @@ class Shifter extends Dispatcher {
     }
 
 
-    _up(e) {
+    _pointerUp(e) {
         console.log("shifter.up")
         if (this._disabled) return;
 
@@ -274,6 +278,10 @@ class Shifter extends Dispatcher {
         //console.log(this._listeners)
     }
 
+    _pointerCancelled(e) {
+        this.dispatch(Shifter.Evt.CANCELLED, e);
+    }
+
     _checkClick(e) {
 
         if (this._gestureDuration > 300) return false;
@@ -293,7 +301,7 @@ class Shifter extends Dispatcher {
     }
 
     _removeMoveListeners() {
-        this._target.removeEventListener("pointermove", this._move);
+        this._target.removeEventListener("pointermove", this._pointerMove);
         this._isPanningX = false;
     }
 
@@ -478,6 +486,7 @@ Shifter.Evt = {
     START: "start",
     MOVE: "move",
     UP: "up",
+    CANCELLED: "cancelled",
     CLICK: "click",
 };
 

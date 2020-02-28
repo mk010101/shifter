@@ -60,6 +60,7 @@ class PagesViewer {
     _init() {
         this._onShifterStart = this._onShifterStart.bind(this);
         this._onPanXEnd = this._onPanXEnd.bind(this);
+        this._onShifterCancelled = this._onShifterCancelled.bind(this);
     }
 
     render(parent) {
@@ -89,6 +90,7 @@ class PagesViewer {
 
         //this._shifter.on(Shifter.Evt.START, this._onShifterStart);
         this._shifter.on(Shifter.Evt.UP, this._onPanXEnd);
+        this._shifter.on(Shifter.Evt.CANCELLED, this._onShifterCancelled);
 
     }
 
@@ -123,19 +125,20 @@ class PagesViewer {
         //console.log(this._shifter.gestureDuration)
         //console.log(speed)
 
-        let closestPage = this._children.reduce((prev, curr) => {
-            return Math.abs(prev.boundsX) < Math.abs(curr.boundsX) ? prev : curr;
-        });
-        let index = this._children.indexOf(closestPage);
+        let result = this._getNearestPage();
 
         /// User swipe slow ------
-        if (speed < -minSpeed && index < this._children.length - 1) {
-            this._move(this._children[index + 1]);
-        } else if (speed > minSpeed && index > 0) {
-            this._move(this._children[index - 1]);
+        if (speed < -minSpeed && result.index < this._children.length - 1) {
+            this._move(this._children[result.index + 1]);
+        } else if (speed > minSpeed && result.index > 0) {
+            this._move(this._children[result.index - 1]);
         } else {
-            this._move(closestPage);
+            this._move(result.page);
         }
+    }
+
+    _onShifterCancelled(e) {
+        this._move(this._getNearestPage().page);
     }
 
     _move(page) {
@@ -148,6 +151,15 @@ class PagesViewer {
                 this._shifter.disabled = false;
                 this._curretPage = page;
             });
+    }
+
+
+    _getNearestPage() {
+        let closestPage = this._children.reduce((prev, curr) => {
+            return Math.abs(prev.boundsX) < Math.abs(curr.boundsX) ? prev : curr;
+        });
+        let index = this._children.indexOf(closestPage);
+        return {page: closestPage, index: index};
     }
 
 

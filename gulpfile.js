@@ -42,10 +42,10 @@ const inputOptions = {
 
 const outputOptions = {
     format: "esm", // required
-    file: "./example/libs/shifter.js",
+    file: "./example/libs/Shifter.js",
     //file: "shifter.js",
     //dir :"./example/libs",
-    name: "shifter", // exposed name of the lib.
+    name: "Shifter", // exposed name of the lib.
     exports: "named",
     globals: "window"
 };
