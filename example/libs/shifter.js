@@ -46,6 +46,7 @@ class Dispatcher {
 class Shifter extends Dispatcher {
     constructor() {
         super();
+        console.log(this);
     }
 }
 

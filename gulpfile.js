@@ -16,8 +16,8 @@ gulp.task('bSync', function() {
 /* =====================================================================================
  WATCH
  ======================================================================================*/
-gulp.task('watch', function () {
-    gulp.watch('./src/**/*.*', ['package']);
+gulp.task('watch', ()=> {
+    gulp.watch('./src/**/*.js', gulp.series(['package']));
 
 });
 
@@ -25,7 +25,7 @@ gulp.task('watch', function () {
 /* =====================================================================================
     MAIN
 ======================================================================================*/
-    gulp.task('default', gulp.series(['bSync', 'watch']));
+    gulp.task('default', gulp.parallel(['bSync', 'watch']));
 
 
 
@@ -57,6 +57,8 @@ gulp.task('package', ()=> {
             name: 'shifter',
             sourcemap: true
         });
+
+        bSync.reload({stream: false});
 
         resolve();
 

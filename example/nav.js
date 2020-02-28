@@ -1,4 +1,4 @@
-import {Shifter} from "./libs/Shifter.js";
+import {Shifter} from "./libs/shifter.js";
 
 
 // data stub -----------------------------------------------------------------------------------------------------------
