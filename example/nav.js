@@ -89,7 +89,7 @@ class PagesViewer {
         this._shifter = new Shifter(this._html, [Shifter.Func.PAN_X]);
 
         //this._shifter.on(Shifter.Evt.START, this._onShifterStart);
-        this._shifter.on(Shifter.Evt.UP, this._onPanXEnd);
+        this._shifter.on(Shifter.Evt.PAN_X_END, this._onPanXEnd);
         this._shifter.on(Shifter.Evt.CANCELLED, this._onShifterCancelled);
 
     }
