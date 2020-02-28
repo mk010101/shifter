@@ -34,12 +34,20 @@ gulp.task('watch', ()=> {
  ROLLUP
  ======================================================================================*/
 
-const inOptions = {
-
+const inputOptions = {
+    input: "./src/Shifter.js"
 };
 
-const outOptions = {
 
+
+const outputOptions = {
+    format: "esm", // required
+    file: "./example/libs/shifter.js",
+    //file: "shifter.js",
+    //dir :"./example/libs",
+    name: "shifter", // exposed name of the lib.
+    exports: "named",
+    globals: "window"
 };
 
 gulp.task('package', ()=> {
@@ -47,16 +55,9 @@ gulp.task('package', ()=> {
     return new Promise(async resolve => {
 
 
-        const bundle = await rollup.rollup({
-            input: './src/Shifter.js',
-        });
+        const bundle = await rollup.rollup(inputOptions);
 
-        await bundle.write({
-            file: './example/libs/shifter.js',
-            format: 'esm',
-            name: 'shifter',
-            sourcemap: true
-        });
+        await bundle.write(outputOptions);
 
         bSync.reload({stream: false});
 
