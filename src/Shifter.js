@@ -26,35 +26,37 @@ class Shifter extends Dispatcher {
         this._targetScale = 1;
         // -------------------------------
 
-        // Pointer moved distance -------
+        // Pointer distance ---------------
 
         this._pointerXstart = 0;
         this._pointerYstart = 0;
         this._pointerXend = 0;
         this._pointerYend = 0;
 
+        this._pinchDist0 = 0;
+
         // -------------------------------
 
 
         this._movesStack = [];
 
-        this._pinchDist0 = 0;
         this._pointerMovedX = 0;
         this._pointerMovedY = 0;
         this._gestureStrartTime = 0;
         this._gestureDuration = 0;
+
         this._zoomSpeed = 0.025;
         this._minZoom = .5;
         this._maxZoom = 2;
+        this._detectPanDist = 5;
 
         this._speedX0 = 0;
-        this._speedX = 0;
         this._speedY0 = 0;
+        this._speedX = 0;
         this._speedY = 0;
 
         this._panX0 = 0;
         this._panY0 = 0;
-        this._detectPanDist = 5;
         this._isPanningX = false;
 
         this._isPassiveEvt = true;
@@ -97,7 +99,6 @@ class Shifter extends Dispatcher {
             this._target.addEventListener("pointerdown", this._pointerDown);
             window.addEventListener("pointerup", this._pointerUp);
             window.addEventListener("pointercancel", this._pointerCancelled);
-            //window.addEventListener("pointercancel", (e)=> {console.log("cancel")}, {passive: this._isPassiveEvt});
             //window.addEventListener("pointerout", (e)=> {console.log("out")}, {passive: this._isPassiveEvt});
 
         } else {
@@ -222,16 +223,9 @@ class Shifter extends Dispatcher {
         let clientX = e.clientX;
         let clientY = e.clientY;
 
-        this._speedX = clientX - this._speedX0;
-        this._speedY = clientY - this._speedY0;
-
-        let x = e.clientX - this._panX0;
-        let y = e.clientY - this._panY0;
-
-        //this._pointerMovedX =
 
 
-        this._movesStack.push({vx: this._speedX, vy: y});
+        this._movesStack.push({vx: clientX - this._speedX0, vy: clientY - this._speedY0});
         if (this._movesStack.length > 10) {
             this._movesStack.shift();
         }
@@ -246,7 +240,6 @@ class Shifter extends Dispatcher {
         this._speedX0 = clientX;
         this._speedY0 = clientY;
 
-        //console.log(this._speedX)
 
     }
 
@@ -268,8 +261,8 @@ class Shifter extends Dispatcher {
 
 
         let reducer = (previous, current) => previous + current.vx;
-        let velX = this._movesStack.reduce(reducer, 0) / this._movesStack.length;
-        console.log(velX, this._movesStack.length)
+        this._speedX = this._movesStack.reduce(reducer, 0) / this._movesStack.length;
+        console.log(this._speedX, this._movesStack.length);
 
 
         this._dispatchEnd(e);
