@@ -19,6 +19,7 @@
   "devDependencies": {
     "browser-sync": "^2.26.7",
     "gulp": "^4.0.2",
-    "gulp-cli": "^2.2.0"
+    "gulp-cli": "^2.2.0",
+    "rollup": "^1.32.0"
   }
 }

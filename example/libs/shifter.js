@@ -43,4 +43,15 @@ class Dispatcher {
 
 }
 
-export {Dispatcher};
+class Shifter extends Dispatcher {
+    constructor() {
+        super();
+    }
+}
+
+
+var Shifter$1 = {Shifter};
+
+export default Shifter$1;
+export { Shifter };
+//# sourceMappingURL=shifter.js.map
