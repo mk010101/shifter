@@ -260,8 +260,10 @@ class Shifter extends Dispatcher {
         this._unlockScroll();
 
 
-        let reducer = (previous, current) => previous + current.vx;
-        this._speedX = this._movesStack.reduce(reducer, 0) / this._movesStack.length;
+        let speed = Shifter._getAvgSpeed(this._movesStack);
+
+        this._speedX = speed.vx;
+        this._speedY = speed.vy;
         console.log(this._speedX, this._movesStack.length);
 
 
@@ -282,6 +284,24 @@ class Shifter extends Dispatcher {
 
         console.log("-------")
     }
+
+    static _getAvgSpeed(arr) {
+
+        let vx = 0;
+        let vy = 0;
+
+        for (let i = 0; i <arr.length; i++) {
+            vx += arr[i].vx;
+            vy += arr[i].vy;
+        }
+
+        return {
+            vx: vx / arr.length,
+            vy: vy / arr.length,
+        }
+    }
+
+
 
     _pointerCancelled(e) {
         this._pointers = [];
