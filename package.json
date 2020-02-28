@@ -1,0 +1,24 @@
+{
+  "name": "dev_tests",
+  "version": "1.0.0",
+  "description": "tests",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mk010101/dev_tests.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mk010101/dev_tests/issues"
+  },
+  "homepage": "https://github.com/mk010101/dev_tests#readme",
+  "devDependencies": {
+    "browser-sync": "^2.26.7",
+    "gulp": "^4.0.2",
+    "gulp-cli": "^2.2.0"
+  }
+}

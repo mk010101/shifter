@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no, shrink-to-fit=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>panzoom</title>
+
+    <style>
+
+        html, body {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        .media {
+            position: relative;
+            width: 90vw;
+            user-select: none;
+        }
+
+
+        img {
+            pointer-events: none;
+            display: block;
+            width: 100%;
+            position: relative;
+        }
+
+
+        p {
+            margin-bottom: 1rem;
+            margin-top: 0;
+        }
+
+
+        .hotspot {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background-color: #68a7cb;
+            top: 0;
+            margin-top: 10%;
+            margin-left: 25%;
+            cursor: pointer;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<main class="app">
+    <header class="header">header</header>
+    <div class="pages-container">
+        <section class="page-content">
+            <div class="media"><img src="../assets/1.jpg" alt="Hello world!">
+                <div class="hotspot"></div>
+            </div>
+            <div>${pageData.text}</div>
+        </section>
+    </div>
+    <footer class="footer">footer</footer>
+</main>
+
+<script src="../libs/glide.js"></script>
+
+
+<script type="module">
+
+    import {Shifter} from "./Shifter.js";
+
+
+
+    window.onload = () => {
+
+        const elMedia = document.querySelector(".media");
+
+        const shifter = new Shifter(elMedia, [Shifter.Func.ZOOM, Shifter.Func.PAN]);
+
+        shifter.on(Shifter.Evt.CLICK, e => console.log(e.target));
+        shifter.on(Shifter.Evt.PAN_END, e => console.log("pan end"));
+
+
+
+    }
+
+
+</script>
+
+</body>
+</html>
