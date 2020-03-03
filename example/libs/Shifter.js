@@ -305,7 +305,7 @@ class Shifter extends Dispatcher {
 
         this._speedX = speed.vx;
         this._speedY = speed.vy;
-        console.log(this._speedX, this._movesStack.length);
+        //console.log(this._speedX, this._movesStack.length);
 
 
         this._dispatchEnd(e);
@@ -323,7 +323,7 @@ class Shifter extends Dispatcher {
             //console.log("pan x end")
         }
 
-        console.log("-------");
+        //console.log("-------")
     }
 
     static _getAvgSpeed(arr) {
@@ -403,12 +403,12 @@ class Shifter extends Dispatcher {
      */
     _panX(e) {
 
-        /*
+
         if (this._pointers.length > 1) {
             e.preventDefault();
             return;
         }
-         */
+
 
         let x = e.clientX - this._panX0;
         let y = e.clientY - this._panY0;
@@ -556,8 +556,15 @@ Shifter.Evt = {
 Object.freeze(Shifter.Evt);
 Object.freeze(Shifter.Func);
 
+/*
+CSS properties:
 
-var Shifter$1 = {Shifter};
+    userSelect: "none",
+    webkitTouchCallout: "none",
+    userDrag: "none",
+    touchAction: "none"
 
-export default Shifter$1;
+ */
+
+export default Shifter;
 export { Shifter };
