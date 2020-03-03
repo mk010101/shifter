@@ -2,7 +2,7 @@ import {Dispatcher} from "./Dispatcher.js";
 
 
 
-class Shifter extends Dispatcher {
+export default class Shifter extends Dispatcher {
 
     /**
      *
@@ -516,7 +516,7 @@ Object.freeze(Shifter.Evt);
 Object.freeze(Shifter.Func);
 
 
-export default {Shifter};
+
 export {Shifter};
 
 /*
@@ -528,3 +528,4 @@ CSS properties:
     touchAction: "none"
 
  */
+

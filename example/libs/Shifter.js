@@ -556,9 +556,6 @@ Shifter.Evt = {
 Object.freeze(Shifter.Evt);
 Object.freeze(Shifter.Func);
 
-
-var Shifter$1 = {Shifter};
-
 /*
 CSS properties:
 
@@ -569,5 +566,5 @@ CSS properties:
 
  */
 
-export default Shifter$1;
+export default Shifter;
 export { Shifter };
