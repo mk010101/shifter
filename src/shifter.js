@@ -10,26 +10,37 @@ import {
 } from "./utils.js"
 
 
+const CssProps = {
+    userSelect: "none",
+    webkitTouchCallout: "none",
+    webkitUserSelect: "none",
+    userDrag: "none",
+    touchAction: "none"
+};
+
 const Events = {
     click: Click,
 };
 
+/*
+this.Evt = {
+    target: null,
+    distX: 0,
+    distY: 0,
+    dist: 0,
+    duration: 0,
+    speedX: 0,
+    speedY: 0,
+    speed: 0
+};
+ */
+
 export default class Shifter extends Dispatcher {
 
 
-    constructor(target, funcs) {
-        super();
+    constructor(target, funcs = null, cssProps = null) {
 
-        this.Evt = {
-            target: null,
-            distX: 0,
-            distY: 0,
-            dist: 0,
-            duration: 0,
-            speedX: 0,
-            speedY: 0,
-            speed: 0
-        };
+        super();
 
         this._target = target;
         this._funcs = [];
@@ -77,6 +88,15 @@ export default class Shifter extends Dispatcher {
                 this._target.addEventListener("wheel", this._onWheel);
             }
         }
+
+        const keys = Object.keys(CssProps);
+        for (let i = 0; i < keys.length; i++) {
+            let key = keys[i];
+            this._target.style[key] = CssProps[key];
+            //console.log(key, ke)
+        }
+
+
         this._setTransforms();
 
 
