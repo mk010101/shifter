@@ -43,6 +43,10 @@ class Dispatcher {
 
 }
 
+//import Pan from "./actions/pan.js";
+
+
+
 class Shifter extends Dispatcher {
 
     /**
@@ -196,9 +200,9 @@ class Shifter extends Dispatcher {
         this._zoomSpeed = value;
     }
 
-    updateTransforms() {
-        this._setTransforms();
-    }
+    // updateTransforms() {
+    //     this._parseTargetTransforms();
+    // }
 
     remove(keepCSS = true) {
 
@@ -237,7 +241,7 @@ class Shifter extends Dispatcher {
         this._pointerMovedX = clientX;
         this._pointerMovedY = clientY;
 
-        this._setTransforms();
+        this._parseTargetTransforms();
 
         this._speedX0 = clientX;
         this._speedY0 = clientY;
@@ -253,6 +257,8 @@ class Shifter extends Dispatcher {
 
         this._target.addEventListener("pointermove", this._pointerMove, {passive: this._isPassiveEvt});
         this.dispatch(Shifter.Evt.START, e);
+
+        //Pan.onDown(e);
 
     }
 
@@ -376,7 +382,7 @@ class Shifter extends Dispatcher {
         this.dispatch(Shifter.Evt.UP, e);
     }
 
-    _setTransforms() {
+    _parseTargetTransforms() {
         let str = this._target.style.transform;
         let arr = str.split(/\s+/gmi);
         for (let i = 0; i < arr.length; i++) {
