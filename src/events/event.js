@@ -4,6 +4,7 @@ export default class Event {
     constructor(target, evt) {
 
         this._target = target;
+        this.name = "event"
 
     }
 
@@ -21,7 +22,7 @@ export default class Event {
     }
 
     onCancelled(e) {
-        this._pointers = [];
+
     }
 
     onWheel(e) {

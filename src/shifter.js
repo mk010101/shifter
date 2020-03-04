@@ -10,7 +10,6 @@ import {
 } from "./utils.js"
 
 
-
 export default class Shifter extends Dispatcher {
 
 
@@ -39,37 +38,37 @@ export default class Shifter extends Dispatcher {
 
     }
 
+    on(event, listener) {
+
+        this._events.push(new event(this.target));
+    }
+
 
     _init(funcs) {
 
-        if ("PointerEvent" in window) {
+        if (!"PointerEvent" in window) throw ("Pointer events are not supported on your device.");
 
-            this._pDown = this._pDown.bind(this);
-            this._pMove = this._pMove.bind(this);
-            this._pUp = this._pUp.bind(this);
-            this._pCancelled = this._pCancelled.bind(this);
-            this._onWheel = this._onWheel.bind(this);
-            this._dispatchEnd = this._dispatchEnd.bind(this);
+        this._pDown = this._pDown.bind(this);
+        this._pMove = this._pMove.bind(this);
+        this._pUp = this._pUp.bind(this);
+        this._pCancelled = this._pCancelled.bind(this);
+        this._onWheel = this._onWheel.bind(this);
+        this._dispatchEnd = this._dispatchEnd.bind(this);
 
-            this._target.addEventListener("pointerdown", this._pDown);
-            window.addEventListener("pointerup", this._pUp);
-            window.addEventListener("pointercancel", this._pCancelled);
+        this._target.addEventListener("pointerdown", this._pDown);
+        window.addEventListener("pointerup", this._pUp);
+        window.addEventListener("pointercancel", this._pCancelled);
 
 
-            let transforms = this._parseTargetTransforms();
-            for (let i = 0; i < funcs.length; i++) {
+        let transforms = this._parseTargetTransforms();
 
-                this._funcs.push(new funcs[i](this._target, transforms));
-
-                if (funcs[i] === Zoom) {
-                    this._target.addEventListener("wheel", this._onWheel);
-                }
+        for (let i = 0; i < funcs.length; i++) {
+            this._funcs.push(new funcs[i](this._target, transforms));
+            if (funcs[i] === Zoom) {
+                this._target.addEventListener("wheel", this._onWheel);
             }
-            this._setTransforms();
-
-        } else {
-            throw ("Pointer events are not supported on your device.");
         }
+        this._setTransforms();
 
 
     }
@@ -77,27 +76,43 @@ export default class Shifter extends Dispatcher {
 
     _pDown(e) {
 
-
         for (let i = 0; i < this._funcs.length; i++) {
             this._funcs[i].onDown(e);
         }
+
+        for (let i = 0; i < this._events.length; i++) {
+            this._events[i].onDown(e);
+        }
+
         this._target.addEventListener("pointermove", this._pMove, {passive: this._isPassiveEvt});
 
     }
 
 
     _pMove(e) {
+
         for (let i = 0; i < this._funcs.length; i++) {
             this._funcs[i].onMove(e);
         }
+
+        for (let i = 0; i < this._events.length; i++) {
+            this._events[i].onMove(e);
+        }
+
         this._setTransforms();
     }
 
 
     _pUp(e) {
+
         for (let i = 0; i < this._funcs.length; i++) {
             this._funcs[i].onUp(e);
         }
+
+        for (let i = 0; i < this._events.length; i++) {
+            this._events[i].onUp(e);
+        }
+
         this._target.removeEventListener("pointermove", this._pMove);
     }
 
@@ -138,12 +153,10 @@ export default class Shifter extends Dispatcher {
     };
 
 
-
     _parseTargetTransforms() {
         let str = window.getComputedStyle(this._target).transform;
         return splitTransformMatrix(str);
     }
-
 
 
 }
@@ -157,16 +170,16 @@ Shifter.Func = {
 };
 
 Shifter.Evt = {
-    PAN_X_START: "panXStart",
-    PAN_X_PROGRESS: "panXProgress",
-    PAN_X_END: "panXEnd",
-    PAN_START: "panStart",
-    PAN_PROGRESS: "panProgress",
-    PAN_END: "panEnd",
-    START: "start",
-    MOVE: "move",
-    UP: "up",
-    CANCELLED: "cancelled",
+    //PAN_X_START: "panXStart",
+    //PAN_X_PROGRESS: "panXProgress",
+    //PAN_X_END: "panXEnd",
+    //PAN_START: "panStart",
+    //PAN_PROGRESS: "panProgress",
+    //PAN_END: "panEnd",
+    //START: "start",
+    //MOVE: "move",
+    //UP: "up",
+    //CANCELLED: "cancelled",
     CLICK: Click,
 };
 
