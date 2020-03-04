@@ -7,8 +7,10 @@ gulp.task('bSync', function() {
     bSync.init({
         server: {
             baseDir: "./example",
-            directory: true
+            directory: true,
+            proxy: "192.168.0.13"
         },
+        port: 3030,
 
     });
 });
