@@ -25,11 +25,22 @@ export default class Action {
                 this._pointers.splice(i, 1);
             }
         }
+    }
 
+    onCancelled(e) {
+        this._pointers = [];
     }
 
     onWheel(e) {
 
     }
+
+
+    destroy() {
+        this.transforms = [];
+        this._target = null;
+        this._pointers = [];
+    }
+
 
 }

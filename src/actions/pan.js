@@ -1,6 +1,6 @@
 import Action from "./action";
 
-
+// 4, 5
 export default class Pan extends Action {
 
     constructor(target, transforms) {

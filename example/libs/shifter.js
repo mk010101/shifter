@@ -70,15 +70,27 @@ class Action {
                 this._pointers.splice(i, 1);
             }
         }
+    }
 
+    onCancelled(e) {
+        this._pointers = [];
     }
 
     onWheel(e) {
 
     }
 
+
+    destroy() {
+        this.transforms = [];
+        this._target = null;
+        this._pointers = [];
+    }
+
+
 }
 
+// 4, 5
 class Pan extends Action {
 
     constructor(target, transforms) {
@@ -109,6 +121,77 @@ class Pan extends Action {
         let y = e.clientY - this._y0;
         this.transforms[4] = x;
         this.transforms[5] = y;
+    }
+
+
+}
+
+// [4, (5)]
+
+class Pan_X extends Action {
+
+    constructor(target, transforms) {
+
+        super(target, transforms);
+
+        this._detectPanDist = 10;
+        this._isPanningX = false;
+        this._canPan = true;
+        this._panX0 = 0;
+        this._panY0 = 0;
+    }
+
+
+    onDown(e) {
+        super.onDown(e);
+        this._panX0 = e.clientX - this.transforms[4];
+        this._panY0 = e.clientY - this.transforms[5];
+        this._canPan = true;
+    }
+
+
+    onMove(e) {
+
+
+        if (this._pointers.length > 1 || !this._canPan) {
+            e.preventDefault();
+            return;
+        }
+
+
+        let x = e.clientX - this._panX0;
+        let y = e.clientY - this._panY0;
+
+
+        if (!this._isPanningX) {
+
+            let xa = Math.abs(x - this.transforms[4]);
+            let ya = Math.abs(y);
+
+            if (ya > this._detectPanDist && ya * 2 > xa) {
+                this._canPan = false;
+            } else if (xa > this._detectPanDist && xa > ya * 2) {
+                this._isPanningX = true;
+                this._lockScroll();
+
+                //this.dispatch(Shifter.Evt.PAN_X_START, e);
+            }
+        } else {
+            this.transforms[4] = x;
+            //this.dispatch(Shifter.Evt.PAN_X_PROGRESS, e);
+        }
+
+
+
+    }
+
+    onUp(e) {
+        super.onUp(e);
+        this._isPanningX = false;
+    }
+
+    _lockScroll() {
+
     }
 
 
@@ -174,6 +257,98 @@ class Zoom extends Action {
 
 }
 
+class Event {
+
+
+    constructor(target, evt) {
+
+        this._target = target;
+
+    }
+
+
+    onDown(e) {
+
+    }
+
+    onMove(e) {
+
+    }
+
+    onUp(e){
+
+    }
+
+    onCancelled(e) {
+        this._pointers = [];
+    }
+
+    onWheel(e) {
+
+    }
+
+
+    destroy() {
+        this._target = null;
+    }
+
+
+}
+
+class Click extends Event {
+
+
+    constructor(target, evt) {
+
+        super(target);
+        this._target = target;
+
+    }
+
+
+    onDown(e) {
+
+    }
+
+    onMove(e) {
+
+    }
+
+    onUp(e){
+
+    }
+
+    onCancelled(e) {
+        this._pointers = [];
+    }
+
+    onWheel(e) {
+
+    }
+
+
+    destroy() {
+        this._target = null;
+    }
+
+
+}
+
+/**
+ * Takes a CSS 2D transform matrix and returns an array of values:
+ * matrix( scaleX(), skewY(), skewX(), scaleY(), translateX(), translateY() )
+ * @param str 2d transform matrix string
+ * @returns {Array}
+ */
+function splitTransformMatrix(str) {
+
+    let res = str.match(/[-0-9.]+/gi);
+    if (res) {
+        res = res.map(v => parseFloat(v));
+    } else res = [1, 0, 0, 1, 0, 0];
+    return res;
+}
+
 class Shifter extends Dispatcher {
 
 
@@ -194,6 +369,7 @@ class Shifter extends Dispatcher {
         this._target = target;
         this._funcs = [];
         this._gestures = [];
+        this._events = [];
         this._disabled = false;
         this._isPassiveEvt = true;
 
@@ -227,6 +403,7 @@ class Shifter extends Dispatcher {
                     this._target.addEventListener("wheel", this._onWheel);
                 }
             }
+            this._setTransforms();
 
         } else {
             throw ("Pointer events are not supported on your device.");
@@ -264,7 +441,10 @@ class Shifter extends Dispatcher {
 
 
     _pCancelled(e) {
-
+        for (let i = 0; i < this._funcs.length; i++) {
+            this._funcs[i].onCancelled(e);
+        }
+        this._target.removeEventListener("pointermove", this._pMove);
     }
 
     _onWheel(e) {
@@ -279,40 +459,36 @@ class Shifter extends Dispatcher {
 
     }
 
-    _setTransforms() {
-        this._target.style.transform = `matrix(
-        ${this._funcs[0].transforms[0] || 1}, 
-        ${this._funcs[0].transforms[1] || 0}, 
-        ${this._funcs[0].transforms[2] || 0}, 
-        ${this._funcs[0].transforms[3] || 1},  
-        ${this._funcs[0].transforms[4] || 0}, 
-        ${this._funcs[0].transforms[5] || 0})`;
-    };
-
     /*
         matrix( scaleX(), skewY(), skewX(), scaleY(), translateX(), translateY() )
      */
 
+    _setTransforms() {
+        if (this._funcs.length > 0) {
+            this._target.style.transform = `matrix(
+            ${this._funcs[0].transforms[0] || 1}, 
+            ${this._funcs[0].transforms[1] || 0}, 
+            ${this._funcs[0].transforms[2] || 0}, 
+            ${this._funcs[0].transforms[3] || 1},  
+            ${this._funcs[0].transforms[4] || 0}, 
+            ${this._funcs[0].transforms[5] || 0})`;
+        }
+    };
+
+
+
     _parseTargetTransforms() {
         let str = window.getComputedStyle(this._target).transform;
-        return Shifter._splitMatrix(str);
+        return splitTransformMatrix(str);
     }
 
-    static _splitMatrix(str) {
-
-        let res = str.match(/[-0-9.]+/gi);
-        if (res) {
-            res = res.map(v => parseFloat(v));
-        } else res = [1, 0, 0, 1, 0, 0];
-        return res;
-    }
 
 
 }
 
 
 Shifter.Func = {
-    PAN_X: "_panX",
+    PAN_X: Pan_X,
     PAN: Pan,
     ZOOM: Zoom,
 
@@ -329,7 +505,7 @@ Shifter.Evt = {
     MOVE: "move",
     UP: "up",
     CANCELLED: "cancelled",
-    CLICK: "click",
+    CLICK: Click,
 };
 
 Object.freeze(Shifter.Evt);

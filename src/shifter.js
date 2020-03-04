@@ -1,6 +1,14 @@
 import {Dispatcher} from "./Dispatcher.js";
 import Pan from "./actions/pan.js";
+import Pan_X from "./actions/pan_x";
 import Zoom from "./actions/zoom.js";
+
+import Click from "./events/click.js";
+
+import {
+    splitTransformMatrix,
+} from "./utils.js"
+
 
 
 export default class Shifter extends Dispatcher {
@@ -23,6 +31,7 @@ export default class Shifter extends Dispatcher {
         this._target = target;
         this._funcs = [];
         this._gestures = [];
+        this._events = [];
         this._disabled = false;
         this._isPassiveEvt = true;
 
@@ -56,6 +65,7 @@ export default class Shifter extends Dispatcher {
                     this._target.addEventListener("wheel", this._onWheel);
                 }
             }
+            this._setTransforms();
 
         } else {
             throw ("Pointer events are not supported on your device.");
@@ -93,7 +103,10 @@ export default class Shifter extends Dispatcher {
 
 
     _pCancelled(e) {
-
+        for (let i = 0; i < this._funcs.length; i++) {
+            this._funcs[i].onCancelled(e);
+        }
+        this._target.removeEventListener("pointermove", this._pMove);
     }
 
     _onWheel(e) {
@@ -108,40 +121,36 @@ export default class Shifter extends Dispatcher {
 
     }
 
-    _setTransforms() {
-        this._target.style.transform = `matrix(
-        ${this._funcs[0].transforms[0] || 1}, 
-        ${this._funcs[0].transforms[1] || 0}, 
-        ${this._funcs[0].transforms[2] || 0}, 
-        ${this._funcs[0].transforms[3] || 1},  
-        ${this._funcs[0].transforms[4] || 0}, 
-        ${this._funcs[0].transforms[5] || 0})`;
-    };
-
     /*
         matrix( scaleX(), skewY(), skewX(), scaleY(), translateX(), translateY() )
      */
 
+    _setTransforms() {
+        if (this._funcs.length > 0) {
+            this._target.style.transform = `matrix(
+            ${this._funcs[0].transforms[0] || 1}, 
+            ${this._funcs[0].transforms[1] || 0}, 
+            ${this._funcs[0].transforms[2] || 0}, 
+            ${this._funcs[0].transforms[3] || 1},  
+            ${this._funcs[0].transforms[4] || 0}, 
+            ${this._funcs[0].transforms[5] || 0})`;
+        }
+    };
+
+
+
     _parseTargetTransforms() {
         let str = window.getComputedStyle(this._target).transform;
-        return Shifter._splitMatrix(str);
+        return splitTransformMatrix(str);
     }
 
-    static _splitMatrix(str) {
-
-        let res = str.match(/[-0-9.]+/gi);
-        if (res) {
-            res = res.map(v => parseFloat(v));
-        } else res = [1, 0, 0, 1, 0, 0];
-        return res;
-    }
 
 
 }
 
 
 Shifter.Func = {
-    PAN_X: "_panX",
+    PAN_X: Pan_X,
     PAN: Pan,
     ZOOM: Zoom,
 
@@ -158,7 +167,7 @@ Shifter.Evt = {
     MOVE: "move",
     UP: "up",
     CANCELLED: "cancelled",
-    CLICK: "click",
+    CLICK: Click,
 };
 
 Object.freeze(Shifter.Evt);
