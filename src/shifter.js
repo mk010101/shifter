@@ -10,7 +10,6 @@ import {
 } from "./utils.js"
 
 
-
 export default class Shifter extends Dispatcher {
 
 
@@ -184,7 +183,7 @@ Shifter.Evt = {
     // MOVE: "move",
     // UP: "up",
     // CANCELLED: "cancelled",
-    CLICK: "Click",
+    click: Click,
 };
 
 
