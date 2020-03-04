@@ -1,4 +1,4 @@
-class ShifterEvent {
+export class ShifterEvent {
 
     constructor(){
         this.type = "";
@@ -64,10 +64,10 @@ export default class Event {
         this.evt.clientY = e.clientY;
         this.evt.layerX = e.layerX;
         this.evt.layerY = e.layerY;
-        this.offsetX = e.offsetX;
-        this.offsetY = e.offsetY;
-        this.pageX = e.pageX;
-        this.pageY = e.pageY;
+        this.evt.offsetX = e.offsetX;
+        this.evt.offsetY = e.offsetY;
+        this.evt.pageX = e.pageX;
+        this.evt.pageY = e.pageY;
 
     }
 
