@@ -8,6 +8,10 @@ class ShifterEvent {
         this.clientY = 0;
         this.layerX = 0;
         this.layerY = 0;
+        this.offsetX = 0;
+        this.offsetY = 0;
+        this.pageX = 0;
+        this.pageY = 0;
 
         this.duration = 0;
     }
@@ -60,6 +64,10 @@ export default class Event {
         this.evt.clientY = e.clientY;
         this.evt.layerX = e.layerX;
         this.evt.layerY = e.layerY;
+        this.offsetX = e.offsetX;
+        this.offsetY = e.offsetY;
+        this.pageX = e.pageX;
+        this.pageY = e.pageY;
 
     }
 
