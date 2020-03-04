@@ -10,6 +10,7 @@ import {
 } from "./utils.js"
 
 
+
 export default class Shifter extends Dispatcher {
 
 
@@ -40,7 +41,10 @@ export default class Shifter extends Dispatcher {
 
     on(event, listener) {
 
-        this._events.push(new event(this.target));
+
+        if (event) {
+            this._events.push(new event(this.target));
+        }
     }
 
 
@@ -170,18 +174,19 @@ Shifter.Func = {
 };
 
 Shifter.Evt = {
-    //PAN_X_START: "panXStart",
-    //PAN_X_PROGRESS: "panXProgress",
-    //PAN_X_END: "panXEnd",
-    //PAN_START: "panStart",
-    //PAN_PROGRESS: "panProgress",
-    //PAN_END: "panEnd",
-    //START: "start",
-    //MOVE: "move",
-    //UP: "up",
-    //CANCELLED: "cancelled",
-    CLICK: Click,
+    // PAN_X_START: "panXStart",
+    // PAN_X_PROGRESS: "panXProgress",
+    // PAN_X_END: "panXEnd",
+    // PAN_START: "panStart",
+    // PAN_PROGRESS: "panProgress",
+    // PAN_END: "panEnd",
+    // START: "start",
+    // MOVE: "move",
+    // UP: "up",
+    // CANCELLED: "cancelled",
+    CLICK: "Click",
 };
+
 
 Object.freeze(Shifter.Evt);
 Object.freeze(Shifter.Func);
