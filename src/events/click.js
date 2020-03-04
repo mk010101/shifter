@@ -3,7 +3,7 @@ import Event from "./event.js"
 export default class Click extends Event {
 
 
-    constructor(target, evt) {
+    constructor(target) {
 
         super(target);
         this.type = "click";
@@ -16,7 +16,7 @@ export default class Click extends Event {
 
 
     onDown(e) {
-        this._gestureStrartTime = Date.now();
+        super.onDown(e);
         this._x0 = e.clientX;
         this._y0 = e.clientY;
     }
@@ -27,13 +27,18 @@ export default class Click extends Event {
 
     onUp(e){
 
-        if (Date.now() - this._gestureStrartTime > 300) return;
+        super.onUp(e);
+
+        if (this.dur > 300) return;
 
         let x = e.clientX;
         let y = e.clientY;
         let dist = Math.sqrt((x - this._x0) * (x - this._x0) + (y - this._y0) * (y - this._y0));
         if (dist < this._maxMoved) {
-            this._target.dispatch(this.type, e)
+            this.setEvt(e);
+            this.evt.type = this.type;
+            this._target.dispatch(this.type, this.evt);
+            console.log(e)
         }
     }
 

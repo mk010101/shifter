@@ -256,19 +256,36 @@ class Zoom extends Action {
 
 }
 
+class ShifterEvent {
+
+    constructor(){
+        this.type = "";
+        this.target = null;
+        this.currentTarget = null;
+        this.clientX = 0;
+        this.clientY = 0;
+        this.layerX = 0;
+        this.layerY = 0;
+
+        this.duration = 0;
+    }
+}
+
 class Event {
 
 
-    constructor(target, shifter) {
+    constructor(target) {
 
         this._target = target;
         this.type = "event";
-
+        this.evt = new ShifterEvent();
+        this.dur = 0;
+        this.startTime = 0;
     }
 
 
     onDown(e) {
-
+        this.startTime = Date.now();
     }
 
     onMove(e) {
@@ -276,11 +293,11 @@ class Event {
     }
 
     onUp(e){
-
+        this.duration = Date.now() - this.startTime;
     }
 
     onCancelled(e) {
-
+        this.duration = Date.now() - this.startTime;
     }
 
     onWheel(e) {
@@ -292,13 +309,24 @@ class Event {
         this._target = null;
     }
 
+    setEvt(e) {
+        this.evt.duration = this.duration;
+
+        this.evt.target = e.target;
+        this.evt.currentTarget = e.currentTarget;
+        this.evt.clientX = e.clientX;
+        this.evt.clientY = e.clientY;
+        this.evt.layerX = e.layerX;
+        this.evt.layerY = e.layerY;
+
+    }
 
 }
 
 class Click extends Event {
 
 
-    constructor(target, evt) {
+    constructor(target) {
 
         super(target);
         this.type = "click";
@@ -311,7 +339,7 @@ class Click extends Event {
 
 
     onDown(e) {
-        this._gestureStrartTime = Date.now();
+        super.onDown(e);
         this._x0 = e.clientX;
         this._y0 = e.clientY;
     }
@@ -322,13 +350,18 @@ class Click extends Event {
 
     onUp(e){
 
-        if (Date.now() - this._gestureStrartTime > 300) return;
+        super.onUp(e);
+
+        if (this.dur > 300) return;
 
         let x = e.clientX;
         let y = e.clientY;
         let dist = Math.sqrt((x - this._x0) * (x - this._x0) + (y - this._y0) * (y - this._y0));
         if (dist < this._maxMoved) {
-            this._target.dispatch(this.type, e);
+            this.setEvt(e);
+            this.evt.type = this.type;
+            this._target.dispatch(this.type, this.evt);
+            console.log(e);
         }
     }
 
