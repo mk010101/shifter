@@ -34,7 +34,6 @@ class Dispatcher {
     dispatch(evtName, data) {
 
         if (!this._listeners[evtName]) return;
-
         for (let i = 0; i < this._listeners[evtName].length; i++) {
             this._listeners[evtName][i](data);
         }

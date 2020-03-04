@@ -33,7 +33,7 @@ export default class Click extends Event {
         let y = e.clientY;
         let dist = Math.sqrt((x - this._x0) * (x - this._x0) + (y - this._y0) * (y - this._y0));
         if (dist < this._maxMoved) {
-            console.log("CLICK")
+            this._target.dispatch(this.type, e)
         }
     }
 

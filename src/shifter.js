@@ -55,9 +55,16 @@ export default class Shifter extends Dispatcher {
 
     on(event, listener) {
 
+        let evt = {
+            name: "",
+            evt: null
+        };
 
         if (Events[event]) {
-            this._events.push(new Events[event](this.target));
+            evt.name = event;
+            evt.evt = new Events[event](this);
+            this._events.push(evt);
+            super.on(evt.name, listener);
         }
 
         return this;
@@ -110,7 +117,7 @@ export default class Shifter extends Dispatcher {
         }
 
         for (let i = 0; i < this._events.length; i++) {
-            this._events[i].onDown(e);
+            this._events[i].evt.onDown(e);
         }
 
         this._target.addEventListener("pointermove", this._pMove, {passive: this._isPassiveEvt});
@@ -125,7 +132,7 @@ export default class Shifter extends Dispatcher {
         }
 
         for (let i = 0; i < this._events.length; i++) {
-            this._events[i].onMove(e);
+            this._events[i].evt.onMove(e);
         }
 
         this._setTransforms();
@@ -139,7 +146,7 @@ export default class Shifter extends Dispatcher {
         }
 
         for (let i = 0; i < this._events.length; i++) {
-            this._events[i].onUp(e);
+            this._events[i].evt.onUp(e);
         }
 
         this._target.removeEventListener("pointermove", this._pMove);

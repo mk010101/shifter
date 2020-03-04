@@ -34,7 +34,6 @@ class Dispatcher {
     dispatch(evtName, data) {
 
         if (!this._listeners[evtName]) return;
-
         for (let i = 0; i < this._listeners[evtName].length; i++) {
             this._listeners[evtName][i](data);
         }
@@ -329,7 +328,7 @@ class Click extends Event {
         let y = e.clientY;
         let dist = Math.sqrt((x - this._x0) * (x - this._x0) + (y - this._y0) * (y - this._y0));
         if (dist < this._maxMoved) {
-            console.log("CLICK");
+            this._target.dispatch(this.type, e);
         }
     }
 
@@ -409,9 +408,16 @@ class Shifter extends Dispatcher {
 
     on(event, listener) {
 
+        let evt = {
+            name: "",
+            evt: null
+        };
 
         if (Events[event]) {
-            this._events.push(new Events[event](this.target));
+            evt.name = event;
+            evt.evt = new Events[event](this);
+            this._events.push(evt);
+            super.on(evt.name, listener);
         }
 
         return this;
@@ -464,7 +470,7 @@ class Shifter extends Dispatcher {
         }
 
         for (let i = 0; i < this._events.length; i++) {
-            this._events[i].onDown(e);
+            this._events[i].evt.onDown(e);
         }
 
         this._target.addEventListener("pointermove", this._pMove, {passive: this._isPassiveEvt});
@@ -479,7 +485,7 @@ class Shifter extends Dispatcher {
         }
 
         for (let i = 0; i < this._events.length; i++) {
-            this._events[i].onMove(e);
+            this._events[i].evt.onMove(e);
         }
 
         this._setTransforms();
@@ -493,7 +499,7 @@ class Shifter extends Dispatcher {
         }
 
         for (let i = 0; i < this._events.length; i++) {
-            this._events[i].onUp(e);
+            this._events[i].evt.onUp(e);
         }
 
         this._target.removeEventListener("pointermove", this._pMove);
