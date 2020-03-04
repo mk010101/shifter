@@ -260,10 +260,10 @@ class Zoom extends Action {
 class Event {
 
 
-    constructor(target, evt) {
+    constructor(target, shifter) {
 
         this._target = target;
-        this.name = "event";
+        this.type = "event";
 
     }
 
@@ -302,6 +302,7 @@ class Click extends Event {
     constructor(target, evt) {
 
         super(target);
+        this.type = "click";
         this._maxMoved = 15;
         this._gestureStrartTime = 0;
         this._x0 = 0;
@@ -363,6 +364,10 @@ function splitTransformMatrix(str) {
     return res;
 }
 
+const Events = {
+    click: Click,
+};
+
 class Shifter extends Dispatcher {
 
 
@@ -394,8 +399,8 @@ class Shifter extends Dispatcher {
     on(event, listener) {
 
 
-        if (event) {
-            this._events.push(new event(this.target));
+        if (Events[event]) {
+            this._events.push(new Events[event](this.target));
         }
 
         return this;
@@ -538,7 +543,7 @@ Shifter.Evt = {
     // MOVE: "move",
     // UP: "up",
     // CANCELLED: "cancelled",
-    click: Click,
+    CLICK: "click",
 };
 
 

@@ -10,6 +10,10 @@ import {
 } from "./utils.js"
 
 
+const Events = {
+    click: Click,
+};
+
 export default class Shifter extends Dispatcher {
 
 
@@ -41,8 +45,8 @@ export default class Shifter extends Dispatcher {
     on(event, listener) {
 
 
-        if (event) {
-            this._events.push(new event(this.target));
+        if (Events[event]) {
+            this._events.push(new Events[event](this.target));
         }
 
         return this;
@@ -185,7 +189,7 @@ Shifter.Evt = {
     // MOVE: "move",
     // UP: "up",
     // CANCELLED: "cancelled",
-    click: Click,
+    CLICK: "click",
 };
 
 

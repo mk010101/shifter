@@ -1,10 +1,10 @@
 export default class Event {
 
 
-    constructor(target, evt) {
+    constructor(target, shifter) {
 
         this._target = target;
-        this.name = "event"
+        this.type = "event"
 
     }
 

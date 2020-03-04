@@ -6,6 +6,7 @@ export default class Click extends Event {
     constructor(target, evt) {
 
         super(target);
+        this.type = "click";
         this._maxMoved = 15;
         this._gestureStrartTime = 0;
         this._x0 = 0;
