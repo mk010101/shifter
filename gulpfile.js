@@ -35,14 +35,14 @@ gulp.task('watch', ()=> {
  ======================================================================================*/
 
 const inputOptions = {
-    input: "./src/Shifter.js"
+    input: "./src/shifter.js"
 };
 
 
 
 const outputOptions = {
     format: "esm", // required
-    file: "./example/libs/Shifter.js",
+    file: "./example/libs/shifter.js",
     //file: "shifter.js",
     //dir :"./example/libs",
     name: "Shifter", // exposed name of the lib.
@@ -52,12 +52,15 @@ const outputOptions = {
 
 gulp.task('package', ()=> {
 
-    return new Promise(async resolve => {
+    return new Promise(async (resolve) => {
 
 
-        const bundle = await rollup.rollup(inputOptions);
+        const bundle = await rollup.rollup(inputOptions)
+            .catch((err)=> {console.log(err)});
 
-        await bundle.write(outputOptions);
+
+        if (bundle) await bundle.write(outputOptions);
+
 
         bSync.reload({stream: false});
 

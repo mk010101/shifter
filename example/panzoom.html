@@ -23,7 +23,7 @@
             width: 50vw;
             user-select: none;
             touch-action: none;
-            margin-left: 1rem;
+            transform: translate(2rem, -.12rem);
         }
 
 
@@ -80,7 +80,7 @@
 
 <script type="module">
 
-    import {Shifter} from "./libs/Shifter.js";
+    import {Shifter} from "./libs/shifter.js";
 
 
 
@@ -88,7 +88,7 @@
 
         const elMedia = document.querySelector(".media");
 
-        const shifter = new Shifter(elMedia, [Shifter.Func.ZOOM, Shifter.Func.PAN]);
+        const shifter = new Shifter(elMedia, [Shifter.Func.PAN, Shifter.Func.ZOOM]);
 
         shifter.on(Shifter.Evt.CLICK, e => console.log(e.target));
         shifter.on(Shifter.Evt.PAN_END, e => console.log("pan end"));
