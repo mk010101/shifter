@@ -1,4 +1,5 @@
 import {Dispatcher} from "./Dispatcher.js";
+//import Pan from "./actions/pan.js";
 
 
 
@@ -90,15 +91,15 @@ export default class Shifter extends Dispatcher {
 
         if ("PointerEvent" in window) {
 
-            this._pointerDown = this._pointerDown.bind(this);
-            this._pointerMove = this._pointerMove.bind(this);
-            this._pointerUp = this._pointerUp.bind(this);
-            this._pointerCancelled = this._pointerCancelled.bind(this);
+            this._pDown = this._pDown.bind(this);
+            this._pMove = this._pMove.bind(this);
+            this._pUp = this._pUp.bind(this);
+            this._pCancelled = this._pCancelled.bind(this);
             this._dispatchEnd = this._dispatchEnd.bind(this);
 
-            this._target.addEventListener("pointerdown", this._pointerDown);
-            window.addEventListener("pointerup", this._pointerUp);
-            window.addEventListener("pointercancel", this._pointerCancelled);
+            this._target.addEventListener("pointerdown", this._pDown);
+            window.addEventListener("pointerup", this._pUp);
+            window.addEventListener("pointercancel", this._pCancelled);
             //window.addEventListener("pointerout", (e)=> {console.log("out")}, {passive: this._isPassiveEvt});
 
         } else {
@@ -155,16 +156,16 @@ export default class Shifter extends Dispatcher {
         this._zoomSpeed = value;
     }
 
-    updateTransforms() {
-        this._setTransforms();
-    }
+    // updateTransforms() {
+    //     this._parseTargetTransforms();
+    // }
 
     remove(keepCSS = true) {
 
         this._target.removeEventListener("wheel", this._wheelZoom);
-        this._target.removeEventListener("pointermove", this._pointerMove);
-        this._target.removeEventListener("pointerdown", this._pointerDown);
-        window.removeEventListener("pointerup", this._pointerUp);
+        this._target.removeEventListener("pointermove", this._pMove);
+        this._target.removeEventListener("pointerdown", this._pDown);
+        window.removeEventListener("pointerup", this._pUp);
         this._unlockScroll();
         this._target = null;
         this.offAll();
@@ -178,7 +179,7 @@ export default class Shifter extends Dispatcher {
      =================================================================================================================*/
 
 
-    _pointerDown(e) {
+    _pDown(e) {
 
         if (this._disabled) return;
 
@@ -196,7 +197,7 @@ export default class Shifter extends Dispatcher {
         this._pointerMovedX = clientX;
         this._pointerMovedY = clientY;
 
-        this._setTransforms();
+        this._parseTargetTransforms();
 
         this._speedX0 = clientX;
         this._speedY0 = clientY;
@@ -210,13 +211,15 @@ export default class Shifter extends Dispatcher {
 
         this._gestureStrartTime = Date.now();
 
-        this._target.addEventListener("pointermove", this._pointerMove, {passive: this._isPassiveEvt});
+        this._target.addEventListener("pointermove", this._pMove, {passive: this._isPassiveEvt});
         this.dispatch(Shifter.Evt.START, e);
+
+        //Pan.onDown(e);
 
     }
 
 
-    _pointerMove(e) {
+    _pMove(e) {
         if (this._disabled) return;
 
 
@@ -244,7 +247,7 @@ export default class Shifter extends Dispatcher {
     }
 
 
-    _pointerUp(e) {
+    _pUp(e) {
         if (this._disabled) return;
 
         for (let i = this._pointers.length - 1; i >= 0; i--) {
@@ -303,7 +306,7 @@ export default class Shifter extends Dispatcher {
 
 
 
-    _pointerCancelled(e) {
+    _pCancelled(e) {
         this._pointers = [];
         this.dispatch(Shifter.Evt.CANCELLED, e);
     }
@@ -327,7 +330,7 @@ export default class Shifter extends Dispatcher {
     }
 
     _removeMoveListeners() {
-        this._target.removeEventListener("pointermove", this._pointerMove);
+        this._target.removeEventListener("pointermove", this._pMove);
         this._isPanningX = false;
     }
 
@@ -335,7 +338,7 @@ export default class Shifter extends Dispatcher {
         this.dispatch(Shifter.Evt.UP, e);
     }
 
-    _setTransforms() {
+    _parseTargetTransforms() {
         let str = this._target.style.transform;
         let arr = str.split(/\s+/gmi);
         for (let i = 0; i < arr.length; i++) {
