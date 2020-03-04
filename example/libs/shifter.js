@@ -397,6 +397,8 @@ class Shifter extends Dispatcher {
         if (event) {
             this._events.push(new event(this.target));
         }
+
+        return this;
     }
 
 
