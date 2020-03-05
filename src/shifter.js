@@ -8,7 +8,9 @@ import Swipe from "./recognizers/swipe.js";
 
 import {
     splitTransformMatrix,
-} from "./utils.js"
+} from "./utils.js";
+
+import Manager from "./manager.js";
 
 
 const CssProps = {
@@ -39,6 +41,8 @@ export default class Shifter extends Dispatcher {
         this._disabled = false;
         this._isPassiveEvt = true;
         this._prevTransforms = [];
+
+        this._manager = new Manager(target);
 
         this._init(funcs);
 
@@ -74,7 +78,7 @@ export default class Shifter extends Dispatcher {
         this._pUp = this._pUp.bind(this);
         this._pCancelled = this._pCancelled.bind(this);
         this._onWheel = this._onWheel.bind(this);
-        this._dispatchEnd = this._dispatchEnd.bind(this);
+        //this._dispatchEnd = this._dispatchEnd.bind(this);
 
         this._target.addEventListener("pointerdown", this._pDown);
         window.addEventListener("pointerup", this._pUp);
@@ -106,6 +110,8 @@ export default class Shifter extends Dispatcher {
 
     _pDown(e) {
 
+        this._manager.onDown(e);
+
         for (let i = 0; i < this._funcs.length; i++) {
             this._funcs[i].onDown(e);
         }
@@ -125,6 +131,8 @@ export default class Shifter extends Dispatcher {
 
     _pMove(e) {
 
+        this._manager.onMove(e);
+
         for (let i = 0; i < this._funcs.length; i++) {
             this._funcs[i].onMove(e);
         }
@@ -139,6 +147,8 @@ export default class Shifter extends Dispatcher {
 
     _pUp(e) {
 
+        this._manager.onUp(e);
+
         for (let i = 0; i < this._funcs.length; i++) {
             this._funcs[i].onUp(e);
         }
@@ -149,6 +159,7 @@ export default class Shifter extends Dispatcher {
         }
 
         this._target.removeEventListener("pointermove", this._pMove);
+
 
         //console.log(this._prevTransforms, this._funcs[0].transforms)
     }

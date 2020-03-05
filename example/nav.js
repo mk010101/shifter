@@ -89,10 +89,10 @@ class PagesViewer {
         this._shifter = new Shifter(this._html, [Shifter.Func.PAN_X]);
 
         //this._shifter.on(Shifter.Evt.START, this._onShifterStart);
-        this._shifter.on(Shifter.Evt.SWIPE, this._onSwipe);
-        this._shifter.on(Shifter.Evt.CANCELLED, this._onShifterCancelled);
+        //this._shifter.on(Shifter.Evt.SWIPE, this._onSwipe);
+        //this._shifter.on(Shifter.Evt.CANCELLED, this._onShifterCancelled);
 
-        this._shifter.on("pan_x_end", (e)=> console.log(e))
+        //this._shifter.on("pan_x_end", (e)=> console.log(e))
 
     }
 
