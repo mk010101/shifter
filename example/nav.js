@@ -121,12 +121,11 @@ class PagesViewer {
 
         let velocity = e.velocityX;
         let movedX = Math.abs(e.panX);
-        let minSpeed = 3;
 
+        let result = this._getNearestPage();
 
+        if (movedX > 1 && Math.abs(velocity) > 0) {
 
-        if (movedX > 30 && Math.abs(velocity) > 10) {
-            let result = this._getNearestPage();
 
 
             if (velocity < 0 && result.index < this._children.length - 1) {
@@ -153,9 +152,8 @@ class PagesViewer {
     _move(page) {
         this._shifter.disabled = true;
         let pos = this._html.getBoundingClientRect().left - page.boundsX;
-        console.log(pos, "---")
         glide.to(this._html, 300,
-            {t: {translateX: pos}},
+            {m: [1, 0, 0, 1, pos, 0]},
             {ease: glide.Ease.quadOut})
             .on("end", () => {
                 this._shifter.disabled = false;

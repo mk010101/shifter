@@ -53,6 +53,9 @@ class Action {
         this._pointers = [];
     }
 
+    updateTransforms(transforms) {
+        this.transforms = transforms;
+    }
 
     onDown(e) {
         this._pointers.push(e);
@@ -536,13 +539,14 @@ class Shifter extends Dispatcher {
 
     _pDown(e) {
 
+        let tr = this._parseTargetTransforms();
+
         for (let i = 0; i < this._funcs.length; i++) {
+            this._funcs[i].updateTransforms(tr);
             this._funcs[i].onDown(e);
         }
 
-        if (this._funcs.length > 0) {
-            this._prevTransforms = this._funcs[0].transforms.concat();
-        }
+        if (this._funcs.length > 0) ;
 
         this._manager.onDown(e);
 

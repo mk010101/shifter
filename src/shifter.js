@@ -88,12 +88,15 @@ export default class Shifter extends Dispatcher {
 
     _pDown(e) {
 
+        let tr = this._parseTargetTransforms();
+
         for (let i = 0; i < this._funcs.length; i++) {
+            this._funcs[i].updateTransforms(tr);
             this._funcs[i].onDown(e);
         }
 
         if (this._funcs.length > 0) {
-            this._prevTransforms = this._funcs[0].transforms.concat();
+            //this._prevTransforms = this._funcs[0].transforms.concat();
         }
 
         this._manager.onDown(e);

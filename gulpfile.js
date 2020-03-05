@@ -4,7 +4,7 @@ const rollup = require("rollup");
 
 
 
-
+/*
 const express = require('express');
 const app = express();
 gulp.task('server', ()=> {
@@ -14,6 +14,7 @@ gulp.task('server', ()=> {
     //const server = app.listen("3030", "192.168.0.13");
     console.log(process.env.PORT)
 });
+ */
 
 
 

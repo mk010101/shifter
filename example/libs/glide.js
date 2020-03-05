@@ -1141,6 +1141,56 @@
         }
     }
 
+    class MatrixSub extends AbstractSub {
+        constructor(target, to, prop, elStyle, compStyle) {
+            super(target, to, prop, elStyle, compStyle);
+            this.oldT = [];
+            this.newT = [];
+            this.init(to, elStyle, compStyle);
+        }
+        init(to, elStyle, compStyle) {
+            this.style = this.target.style;
+            this.oldT = [1, 0, 0, 1, 0, 0];
+            this.newT = to;
+            if (to.length === 2) {
+                this.oldT = to[0];
+                this.newT = to[1];
+            }
+            else {
+                if (compStyle && compStyle.transform) {
+                    this.oldT = MatrixSub.splitTransformMatrix(compStyle.transform);
+                }
+                else if (elStyle.transform) {
+                    if (elStyle.transform.indexOf("matrix") === -1) {
+                        console.log("You can't use non-matrix inline styles in Matrix transforms");
+                    }
+                    else {
+                        this.oldT = MatrixSub.splitTransformMatrix(elStyle.transform);
+                    }
+                }
+            }
+            for (let i = 0; i < this.newT.length; i++) {
+                this.values.push(0);
+                this.newT[i] -= this.oldT[i];
+            }
+        }
+        update(v) {
+            for (let i = 0, k = this.values.length; i < k; i++) {
+                this.values[i] = v * this.newT[i] + this.oldT[i];
+            }
+            this.style.transform = "matrix(" + this.values.join(", ") + ")";
+        }
+        static splitTransformMatrix(str) {
+            let res = str.match(/[-0-9.]+/gi);
+            if (res) {
+                res = res.map((v) => parseFloat(v));
+            }
+            else
+                res = [1, 0, 0, 1, 0, 0];
+            return res;
+        }
+    }
+
     class Tween extends BaseTween {
         constructor(target, duration, params, options) {
             super();
@@ -1461,6 +1511,9 @@
                         else {
                             subs.push(new TransformSub(targ, to, prop, this._style, this._compStyle));
                         }
+                    }
+                    else if (prop === "matrix" || prop === "m") {
+                        subs.push(new MatrixSub(targ, to, prop, this._style, this._compStyle));
                     }
                     else if (prop === "filter" || prop === "f") {
                         subs.push(new FilterSub(targ, to, prop, this._style, this._compStyle));

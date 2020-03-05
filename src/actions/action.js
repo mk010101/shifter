@@ -11,6 +11,9 @@ export default class Action {
         this._pointers = [];
     }
 
+    updateTransforms(transforms) {
+        this.transforms = transforms;
+    }
 
     onDown(e) {
         this._pointers.push(e);
