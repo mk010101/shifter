@@ -306,7 +306,7 @@ class Recognizer {
             velocityX: 0,
             velocityY: 0,
             targetTransformed: false,
-            targetPanned: false,
+            targetMoved: false,
             panX: 0,
             panY: 0,
             scaled: 1,
@@ -329,7 +329,7 @@ class Recognizer {
         this._pointerY0 = e.clientY;
         this._initMatrix = this._getMatrixString();
         this.state.targetTransformed = false;
-        this.state.targetPanned = false;
+        this.state.targetMoved = false;
         this.state.panX = 0;
         this.state.panY = 0;
         this.state.scaled = 0;
@@ -373,7 +373,7 @@ class Recognizer {
         this.state.pointerMovedX = e.clientX - this._pointerX0;
         this.state.pointerMovedY = e.clientY - this._pointerY0;
         this.state.pointerMovedDistance = Math.sqrt(this.state.pointerMovedX * this.state.pointerMovedX + this.state.pointerMovedY * this.state.pointerMovedY);
-        console.log(this.state);
+        //console.log(this.state)
 
 
     }
@@ -401,12 +401,12 @@ class Recognizer {
 
             if (t0[4] !== t1[4]) {
                 this.state.panX = t1[4] - t0[4];
-                this.state.targetPanned = true;
+                this.state.targetMoved = true;
             }
 
             if (t0[5] !== t1[5]) {
                 this.state.panY = t1[5] - t0[5];
-                this.state.targetPanned = true;
+                this.state.targetMoved = true;
             }
 
             if (t0[0] !== t1[0]) this.state.scaled = t1[0] - t0[0];
@@ -576,7 +576,7 @@ class Shifter extends Dispatcher {
 
         this._sendEvt(Shifter.Evt.UP);
 
-        //if (this._manager.state)
+        if (this._manager.state.targetMoved) this._sendEvt(Shifter.Evt.TARGET_MOVED);
 
         let clickListeners = this._listeners[Shifter.Evt.CLICK];
         if (clickListeners && clickListeners.length > 0) {
@@ -621,19 +621,23 @@ class Shifter extends Dispatcher {
 
     _sendEvt(type) {
 
-        let evt = new ShifterEvent();
-        evt.target = this._target;
-        evt.type = type;
+        if (this._listeners[type] && this._listeners[type].length > 0) {
 
-        let props = this._manager.state;
-        let keys = Object.keys(props);
+            let evt = new ShifterEvent();
+            evt.target = this._target;
+            evt.type = type;
 
-        for (let i = 0; i < keys.length; i++) {
-            let k = keys[i];
-            evt[k] = props[k];
+            let props = this._manager.state;
+            let keys = Object.keys(props);
+
+            for (let i = 0; i < keys.length; i++) {
+                let k = keys[i];
+                evt[k] = props[k];
+            }
+
+            console.log(evt);
+            this.dispatch(type, evt);
         }
-
-        this.dispatch(type, evt);
     }
 
     /*
@@ -673,7 +677,7 @@ Shifter.Evt = {
     CANCELLED: "cancelled",
     CLICK: "click",
     SWIPE: "swipe",
-    TARGET_MOVED: "target_moved",
+    TARGET_MOVED: "targetmoved",
     UP: "up",
 };
 

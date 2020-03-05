@@ -128,7 +128,7 @@ export default class Shifter extends Dispatcher {
 
         this._sendEvt(Shifter.Evt.UP);
 
-        //if (this._manager.state)
+        if (this._manager.state.targetMoved) this._sendEvt(Shifter.Evt.TARGET_MOVED);
 
         let clickListeners = this._listeners[Shifter.Evt.CLICK];
         if (clickListeners && clickListeners.length > 0) {
@@ -173,19 +173,23 @@ export default class Shifter extends Dispatcher {
 
     _sendEvt(type) {
 
-        let evt = new ShifterEvent();
-        evt.target = this._target;
-        evt.type = type;
+        if (this._listeners[type] && this._listeners[type].length > 0) {
 
-        let props = this._manager.state;
-        let keys = Object.keys(props);
+            let evt = new ShifterEvent();
+            evt.target = this._target;
+            evt.type = type;
 
-        for (let i = 0; i < keys.length; i++) {
-            let k = keys[i];
-            evt[k] = props[k];
+            let props = this._manager.state;
+            let keys = Object.keys(props);
+
+            for (let i = 0; i < keys.length; i++) {
+                let k = keys[i];
+                evt[k] = props[k];
+            }
+
+            console.log(evt)
+            this.dispatch(type, evt)
         }
-
-        this.dispatch(type, evt)
     }
 
     /*
@@ -225,7 +229,7 @@ Shifter.Evt = {
     CANCELLED: "cancelled",
     CLICK: "click",
     SWIPE: "swipe",
-    TARGET_MOVED: "target_moved",
+    TARGET_MOVED: "targetmoved",
     UP: "up",
 };
 

@@ -26,7 +26,7 @@ export default class Recognizer {
             velocityX: 0,
             velocityY: 0,
             targetTransformed: false,
-            targetPanned: false,
+            targetMoved: false,
             panX: 0,
             panY: 0,
             scaled: 1,
@@ -49,7 +49,7 @@ export default class Recognizer {
         this._pointerY0 = e.clientY;
         this._initMatrix = this._getMatrixString();
         this.state.targetTransformed = false;
-        this.state.targetPanned = false;
+        this.state.targetMoved = false;
         this.state.panX = 0;
         this.state.panY = 0;
         this.state.scaled = 0;
@@ -93,7 +93,7 @@ export default class Recognizer {
         this.state.pointerMovedX = e.clientX - this._pointerX0;
         this.state.pointerMovedY = e.clientY - this._pointerY0;
         this.state.pointerMovedDistance = Math.sqrt(this.state.pointerMovedX * this.state.pointerMovedX + this.state.pointerMovedY * this.state.pointerMovedY);
-        console.log(this.state)
+        //console.log(this.state)
 
 
     }
@@ -121,12 +121,12 @@ export default class Recognizer {
 
             if (t0[4] !== t1[4]) {
                 this.state.panX = t1[4] - t0[4];
-                this.state.targetPanned = true;
+                this.state.targetMoved = true;
             }
 
             if (t0[5] !== t1[5]) {
                 this.state.panY = t1[5] - t0[5];
-                this.state.targetPanned = true;
+                this.state.targetMoved = true;
             }
 
             if (t0[0] !== t1[0]) this.state.scaled = t1[0] - t0[0];
