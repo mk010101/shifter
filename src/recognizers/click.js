@@ -18,6 +18,7 @@ export default class Click extends Recognizer {
         super.onDown(e);
         this._x0 = e.clientX;
         this._y0 = e.clientY;
+        this.canDispatch = false;
     }
 
     onMove(e) {
@@ -28,7 +29,7 @@ export default class Click extends Recognizer {
 
         super.onUp(e);
 
-        if (this.dur > 300) return;
+        if (this.duration > 300) return;
 
         let x = e.clientX;
         let y = e.clientY;
@@ -36,8 +37,8 @@ export default class Click extends Recognizer {
         if (dist < this._maxMoved) {
             this.setEvt(e);
             this.evt.type = this.type;
+            this.canDispatch = true;
             this._target.dispatch(this.type, this.evt);
-            console.log(e)
         }
     }
 

@@ -35,7 +35,7 @@ export default class Shifter extends Dispatcher {
         this._target = target;
         this._funcs = [];
         this._gestures = [];
-        this._events = [];
+        this._recognizers = [];
         this._disabled = false;
         this._isPassiveEvt = true;
         this._prevTransforms = [];
@@ -43,6 +43,7 @@ export default class Shifter extends Dispatcher {
         this._init(funcs);
 
     }
+
 
     on(event, listener) {
 
@@ -53,8 +54,8 @@ export default class Shifter extends Dispatcher {
 
         if (Events[event]) {
             evt.name = event;
-            evt.evt = new Events[event](this);
-            this._events.push(evt);
+            evt.recognizer = new Events[event](this);
+            this._recognizers.push(evt);
             super.on(evt.name, listener);
         } else {
             super.on(event, listener);
@@ -113,8 +114,8 @@ export default class Shifter extends Dispatcher {
             this._prevTransforms = this._funcs[0].transforms.concat();
         }
 
-        for (let i = 0; i < this._events.length; i++) {
-            this._events[i].evt.onDown(e);
+        for (let i = 0; i < this._recognizers.length; i++) {
+            this._recognizers[i].recognizer.onDown(e);
         }
 
         this._target.addEventListener("pointermove", this._pMove, {passive: this._isPassiveEvt});
@@ -128,8 +129,8 @@ export default class Shifter extends Dispatcher {
             this._funcs[i].onMove(e);
         }
 
-        for (let i = 0; i < this._events.length; i++) {
-            this._events[i].evt.onMove(e);
+        for (let i = 0; i < this._recognizers.length; i++) {
+            this._recognizers[i].recognizer.onMove(e);
         }
 
         this._setTransforms();
@@ -142,13 +143,14 @@ export default class Shifter extends Dispatcher {
             this._funcs[i].onUp(e);
         }
 
-        for (let i = 0; i < this._events.length; i++) {
-            this._events[i].evt.onUp(e);
+        for (let i = 0; i < this._recognizers.length; i++) {
+            this._recognizers[i].recognizer.onUp(e);
+
         }
 
         this._target.removeEventListener("pointermove", this._pMove);
 
-        console.log(this._prevTransforms, this._funcs[0].transforms)
+        //console.log(this._prevTransforms, this._funcs[0].transforms)
     }
 
 
@@ -157,6 +159,7 @@ export default class Shifter extends Dispatcher {
             this._funcs[i].onCancelled(e);
         }
         this._target.removeEventListener("pointermove", this._pMove);
+        console.log("Shifter: evt cancelled")
     }
 
     _onWheel(e) {

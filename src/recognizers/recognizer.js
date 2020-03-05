@@ -10,6 +10,9 @@ export default class Recognizer {
         this.evt = new ShifterEvent();
         this.dur = 0;
         this.startTime = 0;
+
+        this.canDispatch = false;
+        this.evtData = null;
     }
 
 

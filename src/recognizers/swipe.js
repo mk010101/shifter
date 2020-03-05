@@ -55,6 +55,7 @@ export default class Swipe extends Recognizer {
     onUp(e) {
 
         super.onUp(e);
+        if(this._movesStack.length === 0) return;
         let {vx, vy} = getAvgSpeed(this._movesStack);
         let absVx = Math.abs(vx);
         let absVy = Math.abs(vy);
@@ -69,7 +70,7 @@ export default class Swipe extends Recognizer {
             } else {
                 this.evt.gesture = ShifterEvent.Gestures.SWIPE_RIGHT;
             }
-            this._target.dispatch(this.type, this.evt);
+            //this._target.dispatch(this.type, this.evt);
         } else if (absVx < absVy * 2) {
             //console.log(vx)
             this.setEvt(e);
@@ -78,9 +79,12 @@ export default class Swipe extends Recognizer {
             } else {
                 this.evt.gesture = ShifterEvent.Gestures.SWIPE_DOWN;
             }
-            this._target.dispatch(this.type, this.evt);
+            //this._target.dispatch(this.type, this.evt);
         }
 
+        this.evt.velocityX = vx;
+        this.evt.velocityY = vy;
+        this._target.dispatch(this.type, this.evt);
 
     }
 
