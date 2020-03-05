@@ -26,7 +26,7 @@ export default class Manager {
             targetTransformed: false,
             translatedX: 0,
             translatedY: 0,
-            scale: 1,
+            scaled: 1,
         };
 
         this.tick = this.tick.bind(this);
@@ -43,6 +43,7 @@ export default class Manager {
         this.evtProps.targetTransformed = false;
         this.evtProps.translatedX = 0;
         this.evtProps.translatedY = 0;
+        this.evtProps.scaled = 0;
         this._isRunning = true;
         requestAnimationFrame(this.tick);
     }
@@ -86,7 +87,7 @@ export default class Manager {
     }
 
     onWheel(e) {
-
+        this._compareMtx();
     }
 
     onCancelled(e) {
@@ -107,6 +108,8 @@ export default class Manager {
 
             if (t0[4] !== t1[4]) this.evtProps.translatedX = t1[4] - t0[4];
             if (t0[5] !== t1[5]) this.evtProps.translatedY = t1[5] - t0[5];
+
+            if (t0[0] !== t1[0]) this.evtProps.translatedY = t1[0] - t0[0];
 
         }
     }

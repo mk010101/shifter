@@ -166,6 +166,9 @@ export default class Shifter extends Dispatcher {
 
 
     _pCancelled(e) {
+
+        this._manager.onCancelled(e);
+
         for (let i = 0; i < this._funcs.length; i++) {
             this._funcs[i].onCancelled(e);
         }
@@ -174,6 +177,9 @@ export default class Shifter extends Dispatcher {
     }
 
     _onWheel(e) {
+
+        this._manager.onWheel(e);
+
         for (let i = 0; i < this._funcs.length; i++) {
             this._funcs[i].onWheel(e);
         }

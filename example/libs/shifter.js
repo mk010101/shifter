@@ -537,7 +537,7 @@ class Manager {
             targetTransformed: false,
             translatedX: 0,
             translatedY: 0,
-            scale: 1,
+            scaled: 1,
         };
 
         this.tick = this.tick.bind(this);
@@ -554,6 +554,7 @@ class Manager {
         this.evtProps.targetTransformed = false;
         this.evtProps.translatedX = 0;
         this.evtProps.translatedY = 0;
+        this.evtProps.scaled = 0;
         this._isRunning = true;
         requestAnimationFrame(this.tick);
     }
@@ -597,7 +598,7 @@ class Manager {
     }
 
     onWheel(e) {
-
+        this._compareMtx();
     }
 
     onCancelled(e) {
@@ -618,6 +619,8 @@ class Manager {
 
             if (t0[4] !== t1[4]) this.evtProps.translatedX = t1[4] - t0[4];
             if (t0[5] !== t1[5]) this.evtProps.translatedY = t1[5] - t0[5];
+
+            if (t0[0] !== t1[0]) this.evtProps.translatedY = t1[0] - t0[0];
 
         }
     }
@@ -799,6 +802,9 @@ class Shifter extends Dispatcher {
 
 
     _pCancelled(e) {
+
+        this._manager.onCancelled(e);
+
         for (let i = 0; i < this._funcs.length; i++) {
             this._funcs[i].onCancelled(e);
         }
@@ -807,6 +813,9 @@ class Shifter extends Dispatcher {
     }
 
     _onWheel(e) {
+
+        this._manager.onWheel(e);
+
         for (let i = 0; i < this._funcs.length; i++) {
             this._funcs[i].onWheel(e);
         }
