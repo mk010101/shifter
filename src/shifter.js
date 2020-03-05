@@ -3,7 +3,8 @@ import Pan from "./actions/pan.js";
 import Pan_X from "./actions/pan_x";
 import Zoom from "./actions/zoom.js";
 
-import Click from "./events/click.js";
+import Click from "./recognizers/click.js";
+import Swipe from "./recognizers/swipe.js";
 
 import {
     splitTransformMatrix,
@@ -20,6 +21,7 @@ const CssProps = {
 
 const Events = {
     click: Click,
+    swipe: Swipe,
 };
 
 /*
@@ -217,6 +219,7 @@ Shifter.Evt = {
     // UP: "up",
     // CANCELLED: "cancelled",
     CLICK: "click",
+    SWIPE: "swipe",
 };
 
 

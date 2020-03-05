@@ -361,7 +361,7 @@ export default class Shifter extends Dispatcher {
 
     /**
      * Pans target on x-Axes. Uses transform.
-     * @param e {Event} Event (touch or mouse)
+     * @param e {Recognizer} Event (touch or mouse)
      */
     _panX(e) {
 
@@ -398,7 +398,7 @@ export default class Shifter extends Dispatcher {
 
     /**
      * Pans target on x- and y- Axes. Uses transform.
-     * @param e {Event} Event (touch or mouse)
+     * @param e {Recognizer} Event (touch or mouse)
      */
     _pan(e) {
 
@@ -419,7 +419,7 @@ export default class Shifter extends Dispatcher {
 
     /**
      * Zooms target. Uses transform.
-     * @param e {Event} Event (touch or mouse)
+     * @param e {Recognizer} Event (touch or mouse)
      */
     _zoom(e) {
 

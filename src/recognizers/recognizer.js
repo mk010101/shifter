@@ -1,23 +1,6 @@
-export class ShifterEvent {
+import ShifterEvent from "./../evt/shifterevent.js";
 
-    constructor(){
-        this.type = "";
-        this.target = null;
-        this.currentTarget = null;
-        this.clientX = 0;
-        this.clientY = 0;
-        this.layerX = 0;
-        this.layerY = 0;
-        this.offsetX = 0;
-        this.offsetY = 0;
-        this.pageX = 0;
-        this.pageY = 0;
-
-        this.duration = 0;
-    }
-}
-
-export default class Event {
+export default class Recognizer {
 
 
     constructor(target) {

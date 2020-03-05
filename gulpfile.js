@@ -3,13 +3,32 @@ const bSync = require('browser-sync').create();
 const rollup = require("rollup");
 
 
+
+
+const express = require('express');
+const app = express();
+gulp.task('server', ()=> {
+    //app.set("host", "192.168.0.13");
+    //app.set("port", "3030");
+    //app.use(express.static('./example'));
+    //const server = app.listen("3030", "192.168.0.13");
+    console.log(process.env.PORT)
+});
+
+
+
+
+
+
 gulp.task('bSync', function() {
     bSync.init({
         server: {
             baseDir: "./example",
             directory: true,
-            proxy: "192.168.0.13"
         },
+        //host: process.env.BSYNC_HOST || undefined,
+       //proxy: "192.168.0.13",
+       //proxy: "b-sync",
         port: 3030,
 
     });

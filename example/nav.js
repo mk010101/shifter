@@ -59,7 +59,7 @@ class PagesViewer {
 
     _init() {
         this._onShifterStart = this._onShifterStart.bind(this);
-        this._onPanXEnd = this._onPanXEnd.bind(this);
+        this._onSwipe = this._onSwipe.bind(this);
         this._onShifterCancelled = this._onShifterCancelled.bind(this);
     }
 
@@ -89,7 +89,7 @@ class PagesViewer {
         this._shifter = new Shifter(this._html, [Shifter.Func.PAN_X]);
 
         //this._shifter.on(Shifter.Evt.START, this._onShifterStart);
-        this._shifter.on(Shifter.Evt.PAN_X_END, this._onPanXEnd);
+        this._shifter.on(Shifter.Evt.SWIPE, this._onSwipe);
         this._shifter.on(Shifter.Evt.CANCELLED, this._onShifterCancelled);
 
     }
@@ -114,9 +114,10 @@ class PagesViewer {
         glide.remove(this._html);
     }
 
-    _onPanXEnd() {
+    _onSwipe() {
 
 
+        return;
         let speed = this._shifter.speedX;
         let minSpeed = 3;
 

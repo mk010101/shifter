@@ -1,6 +1,6 @@
-import Event from "./event.js"
+import Recognizer from "./recognizer.js"
 
-export default class Click extends Event {
+export default class Click extends Recognizer {
 
 
     constructor(target) {

@@ -28,7 +28,7 @@ export default class Pan_X extends Action {
 
 
         if (this._pointers.length > 1 || !this._canPan) {
-            e.preventDefault();
+            //e.preventDefault();
             return;
         }
 
