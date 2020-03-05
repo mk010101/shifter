@@ -126,18 +126,19 @@ export default class Shifter extends Dispatcher {
         this._target.removeEventListener("pointermove", this._pMove);
 
 
-        let upListeners = this._listeners[Shifter.Evt.UP];
+        this._sendEvt(Shifter.Evt.UP);
+
+        //if (this._manager.state)
+
         let clickListeners = this._listeners[Shifter.Evt.CLICK];
-
-
-        if (clickListeners.length > 0 ) {
+        if (clickListeners && clickListeners.length > 0) {
             let t = this._manager.state.duration;
             let dist = this._manager.state.pointerMovedDistance;
-
-            if (t < 300 && dist < params.clickInvalidDistance) this._sendEvt(Shifter.Evt.CLICK);
+            if (t < 300 && dist < params.clickInvalidDistance) {
+                this._sendEvt(Shifter.Evt.CLICK);
+            }
         }
 
-        //console.log(this._prevTransforms, this._funcs[0].transforms)
     }
 
 
@@ -150,7 +151,9 @@ export default class Shifter extends Dispatcher {
         }
 
         this._target.removeEventListener("pointermove", this._pMove);
-        console.log("Shifter: evt cancelled")
+
+        this._sendEvt(Shifter.Evt.CANCELLED);
+
     }
 
     _onWheel(e) {
@@ -219,18 +222,11 @@ Shifter.Func = {
 };
 
 Shifter.Evt = {
-    // PAN_X_START: "panXStart",
-    // PAN_X_PROGRESS: "panXProgress",
-    // PAN_X_END: "panXEnd",
-    // PAN_START: "panStart",
-    // PAN_PROGRESS: "panProgress",
-    // PAN_END: "panEnd",
-    // START: "start",
-    // MOVE: "move",
-    UP: "up",
     CANCELLED: "cancelled",
     CLICK: "click",
     SWIPE: "swipe",
+    TARGET_MOVED: "target_moved",
+    UP: "up",
 };
 
 

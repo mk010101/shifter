@@ -306,8 +306,9 @@ class Recognizer {
             velocityX: 0,
             velocityY: 0,
             targetTransformed: false,
-            translatedX: 0,
-            translatedY: 0,
+            targetPanned: false,
+            panX: 0,
+            panY: 0,
             scaled: 1,
             pointerMovedX: 0,
             pointerMovedY: 0,
@@ -328,8 +329,9 @@ class Recognizer {
         this._pointerY0 = e.clientY;
         this._initMatrix = this._getMatrixString();
         this.state.targetTransformed = false;
-        this.state.translatedX = 0;
-        this.state.translatedY = 0;
+        this.state.targetPanned = false;
+        this.state.panX = 0;
+        this.state.panY = 0;
         this.state.scaled = 0;
         this._isRunning = true;
         requestAnimationFrame(this.tick);
@@ -397,10 +399,17 @@ class Recognizer {
             let t0 = splitTransformMatrix(this._initMatrix);
             let t1 = splitTransformMatrix(newMatrix);
 
-            if (t0[4] !== t1[4]) this.state.translatedX = t1[4] - t0[4];
-            if (t0[5] !== t1[5]) this.state.translatedY = t1[5] - t0[5];
+            if (t0[4] !== t1[4]) {
+                this.state.panX = t1[4] - t0[4];
+                this.state.targetPanned = true;
+            }
 
-            if (t0[0] !== t1[0]) this.state.translatedY = t1[0] - t0[0];
+            if (t0[5] !== t1[5]) {
+                this.state.panY = t1[5] - t0[5];
+                this.state.targetPanned = true;
+            }
+
+            if (t0[0] !== t1[0]) this.state.scaled = t1[0] - t0[0];
 
         }
     }
@@ -578,18 +587,19 @@ class Shifter extends Dispatcher {
         this._target.removeEventListener("pointermove", this._pMove);
 
 
-        let upListeners = this._listeners[Shifter.Evt.UP];
+        this._sendEvt(Shifter.Evt.UP);
+
+        //if (this._manager.state)
+
         let clickListeners = this._listeners[Shifter.Evt.CLICK];
-
-
-        if (clickListeners.length > 0 ) {
+        if (clickListeners && clickListeners.length > 0) {
             let t = this._manager.state.duration;
             let dist = this._manager.state.pointerMovedDistance;
-
-            if (t < 300 && dist < params.clickInvalidDistance) this._sendEvt(Shifter.Evt.CLICK);
+            if (t < 300 && dist < params.clickInvalidDistance) {
+                this._sendEvt(Shifter.Evt.CLICK);
+            }
         }
 
-        //console.log(this._prevTransforms, this._funcs[0].transforms)
     }
 
 
@@ -602,7 +612,9 @@ class Shifter extends Dispatcher {
         }
 
         this._target.removeEventListener("pointermove", this._pMove);
-        console.log("Shifter: evt cancelled");
+
+        this._sendEvt(Shifter.Evt.CANCELLED);
+
     }
 
     _onWheel(e) {
@@ -671,18 +683,11 @@ Shifter.Func = {
 };
 
 Shifter.Evt = {
-    // PAN_X_START: "panXStart",
-    // PAN_X_PROGRESS: "panXProgress",
-    // PAN_X_END: "panXEnd",
-    // PAN_START: "panStart",
-    // PAN_PROGRESS: "panProgress",
-    // PAN_END: "panEnd",
-    // START: "start",
-    // MOVE: "move",
-    UP: "up",
     CANCELLED: "cancelled",
     CLICK: "click",
     SWIPE: "swipe",
+    TARGET_MOVED: "target_moved",
+    UP: "up",
 };
 
 

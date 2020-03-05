@@ -26,8 +26,9 @@ export default class Recognizer {
             velocityX: 0,
             velocityY: 0,
             targetTransformed: false,
-            translatedX: 0,
-            translatedY: 0,
+            targetPanned: false,
+            panX: 0,
+            panY: 0,
             scaled: 1,
             pointerMovedX: 0,
             pointerMovedY: 0,
@@ -48,8 +49,9 @@ export default class Recognizer {
         this._pointerY0 = e.clientY;
         this._initMatrix = this._getMatrixString();
         this.state.targetTransformed = false;
-        this.state.translatedX = 0;
-        this.state.translatedY = 0;
+        this.state.targetPanned = false;
+        this.state.panX = 0;
+        this.state.panY = 0;
         this.state.scaled = 0;
         this._isRunning = true;
         requestAnimationFrame(this.tick);
@@ -117,10 +119,17 @@ export default class Recognizer {
             let t0 = splitTransformMatrix(this._initMatrix);
             let t1 = splitTransformMatrix(newMatrix);
 
-            if (t0[4] !== t1[4]) this.state.translatedX = t1[4] - t0[4];
-            if (t0[5] !== t1[5]) this.state.translatedY = t1[5] - t0[5];
+            if (t0[4] !== t1[4]) {
+                this.state.panX = t1[4] - t0[4];
+                this.state.targetPanned = true;
+            }
 
-            if (t0[0] !== t1[0]) this.state.translatedY = t1[0] - t0[0];
+            if (t0[5] !== t1[5]) {
+                this.state.panY = t1[5] - t0[5];
+                this.state.targetPanned = true;
+            }
+
+            if (t0[0] !== t1[0]) this.state.scaled = t1[0] - t0[0];
 
         }
     }
