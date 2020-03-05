@@ -1,4 +1,5 @@
 import Recognizer from "./recognizer.js"
+import ShifterEvent from "../evt/shifterevent";
 
 
 function getAvgSpeed(arr) {
@@ -6,7 +7,7 @@ function getAvgSpeed(arr) {
     let vx = 0;
     let vy = 0;
 
-    for (let i = 0; i <arr.length; i++) {
+    for (let i = 0; i < arr.length; i++) {
         vx += arr[i].vx;
         vy += arr[i].vy;
     }
@@ -24,7 +25,7 @@ export default class Swipe extends Recognizer {
 
         super(target);
         this.type = "swipe";
-
+        this.evt.type = this.type;
         this._swipeSpeed = 5;
         this._movesStack = [];
         this._x0 = 0;
@@ -51,9 +52,9 @@ export default class Swipe extends Recognizer {
         this._y0 = e.clientY;
     }
 
-    onUp(e){
+    onUp(e) {
 
-        //super.onUp(e);
+        super.onUp(e);
         let {vx, vy} = getAvgSpeed(this._movesStack);
         let absVx = Math.abs(vx);
         let absVy = Math.abs(vy);
@@ -61,7 +62,23 @@ export default class Swipe extends Recognizer {
         if (Math.abs(vx) < this._swipeSpeed && Math.abs(vy) < this._swipeSpeed) return;
 
         if (absVx > absVy * 2) {
-            console.log(vx)
+            //console.log(vx)
+            this.setEvt(e);
+            if (vx < 0) {
+                this.evt.gesture = ShifterEvent.Gestures.SWIPE_LEFT;
+            } else {
+                this.evt.gesture = ShifterEvent.Gestures.SWIPE_RIGHT;
+            }
+            this._target.dispatch(this.type, this.evt);
+        } else if (absVx < absVy * 2) {
+            //console.log(vx)
+            this.setEvt(e);
+            if (vy < 0) {
+                this.evt.gesture = ShifterEvent.Gestures.SWIPE_UP;
+            } else {
+                this.evt.gesture = ShifterEvent.Gestures.SWIPE_DOWN;
+            }
+            this._target.dispatch(this.type, this.evt);
         }
 
 

@@ -114,8 +114,9 @@ class PagesViewer {
         glide.remove(this._html);
     }
 
-    _onSwipe() {
+    _onSwipe(e) {
 
+        console.log(e)
 
         return;
         let speed = this._shifter.speedX;
