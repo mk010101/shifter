@@ -59,7 +59,7 @@ class PagesViewer {
 
     _init() {
         this._onShifterStart = this._onShifterStart.bind(this);
-        this._onSwipe = this._onSwipe.bind(this);
+        this._onTargetMoved = this._onTargetMoved.bind(this);
         this._onShifterCancelled = this._onShifterCancelled.bind(this);
     }
 
@@ -89,7 +89,7 @@ class PagesViewer {
         this._shifter = new Shifter(this._html, [Shifter.Func.PAN_X]);
 
         //this._shifter.on(Shifter.Evt.START, this._onShifterStart);
-        //this._shifter.on(Shifter.Evt.SWIPE, this._onSwipe);
+        this._shifter.on(Shifter.Evt.TARGET_MOVED, this._onTargetMoved);
         //this._shifter.on(Shifter.Evt.CANCELLED, this._onShifterCancelled);
 
         //this._shifter.on("pan_x_end", (e)=> console.log(e))
@@ -116,24 +116,33 @@ class PagesViewer {
         glide.remove(this._html);
     }
 
-    _onSwipe(e) {
+    _onTargetMoved(e) {
 
-        console.log(e)
 
-        return;
-        let speed = this._shifter.speedX;
+        let velocity = e.velocityX;
+        let movedX = Math.abs(e.panX);
         let minSpeed = 3;
 
 
-        let result = this._getNearestPage();
 
-        /// User swipe slow ------
-        if (speed < -minSpeed && result.index < this._children.length - 1) {
-            this._move(this._children[result.index + 1]);
-        } else if (speed > minSpeed && result.index > 0) {
-            this._move(this._children[result.index - 1]);
-        } else {
-            this._move(result.page);
+        if (movedX > 30 && Math.abs(velocity) > 10) {
+            let result = this._getNearestPage();
+
+
+            if (velocity < 0 && result.index < this._children.length - 1) {
+                this._move(this._children[result.index + 1]);
+            }
+
+            /*
+            /// User swipe slow ------
+            if (velocity < -minSpeed && result.index < this._children.length - 1) {
+                this._move(this._children[result.index + 1]);
+            } else if (velocity > minSpeed && result.index > 0) {
+                this._move(this._children[result.index - 1]);
+            } else {
+                this._move(result.page);
+            }
+             */
         }
     }
 
@@ -144,6 +153,7 @@ class PagesViewer {
     _move(page) {
         this._shifter.disabled = true;
         let pos = this._html.getBoundingClientRect().left - page.boundsX;
+        console.log(pos, "---")
         glide.to(this._html, 300,
             {t: {translateX: pos}},
             {ease: glide.Ease.quadOut})
