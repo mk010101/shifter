@@ -438,19 +438,6 @@ function getAvgSpeed(arr) {
     }
 }
 
-/*
-this.evt.target = e.target;
-        this.evt.currentTarget = e.currentTarget;
-        this.evt.clientX = e.clientX;
-        this.evt.clientY = e.clientY;
-        this.evt.layerX = e.layerX;
-        this.evt.layerY = e.layerY;
-        this.evt.offsetX = e.offsetX;
-        this.evt.offsetY = e.offsetY;
-        this.evt.pageX = e.pageX;
-        this.evt.pageY = e.pageY;
- */
-
 const gestures = {
     SWIPE_UP: "swipe_up",
     SWIPE_DOWN: "swipe_down",
