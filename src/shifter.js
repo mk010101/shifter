@@ -3,14 +3,13 @@ import Pan from "./actions/pan.js";
 import Pan_X from "./actions/pan_x";
 import Zoom from "./actions/zoom.js";
 
-import Click from "./recognizers/click.js";
-import Swipe from "./recognizers/swipe.js";
 
 import {
     splitTransformMatrix,
 } from "./utils.js";
 
-import Manager from "./manager.js";
+import Recognizer from "./recognizer.js";
+import ShifterEvent from "./evt/shifterevent";
 
 
 const CssProps = {
@@ -21,9 +20,9 @@ const CssProps = {
     touchAction: "none"
 };
 
-const Events = {
-    click: Click,
-    swipe: Swipe,
+const params = {
+    clickInvalidDistance: 5,
+
 };
 
 
@@ -37,35 +36,14 @@ export default class Shifter extends Dispatcher {
         this._target = target;
         this._funcs = [];
         this._gestures = [];
-        this._recognizers = [];
         this._disabled = false;
         this._isPassiveEvt = true;
         this._prevTransforms = [];
 
-        this._manager = new Manager(target);
+        this._manager = new Recognizer(target);
 
         this._init(funcs);
 
-    }
-
-
-    on(event, listener) {
-
-        let evt = {
-            name: "",
-            evt: null
-        };
-
-        if (Events[event]) {
-            evt.name = event;
-            evt.recognizer = new Events[event](this);
-            this._recognizers.push(evt);
-            super.on(evt.name, listener);
-        } else {
-            super.on(event, listener);
-        }
-
-        return this;
     }
 
 
@@ -110,8 +88,6 @@ export default class Shifter extends Dispatcher {
 
     _pDown(e) {
 
-        this._manager.onDown(e);
-
         for (let i = 0; i < this._funcs.length; i++) {
             this._funcs[i].onDown(e);
         }
@@ -120,9 +96,7 @@ export default class Shifter extends Dispatcher {
             this._prevTransforms = this._funcs[0].transforms.concat();
         }
 
-        for (let i = 0; i < this._recognizers.length; i++) {
-            this._recognizers[i].recognizer.onDown(e);
-        }
+        this._manager.onDown(e);
 
         this._target.addEventListener("pointermove", this._pMove, {passive: this._isPassiveEvt});
 
@@ -131,35 +105,37 @@ export default class Shifter extends Dispatcher {
 
     _pMove(e) {
 
-        this._manager.onMove(e);
-
         for (let i = 0; i < this._funcs.length; i++) {
             this._funcs[i].onMove(e);
         }
-
-        for (let i = 0; i < this._recognizers.length; i++) {
-            this._recognizers[i].recognizer.onMove(e);
-        }
-
         this._setTransforms();
+
+        this._manager.onMove(e);
+
     }
 
 
     _pUp(e) {
 
-        this._manager.onUp(e);
-
         for (let i = 0; i < this._funcs.length; i++) {
             this._funcs[i].onUp(e);
         }
 
-        for (let i = 0; i < this._recognizers.length; i++) {
-            this._recognizers[i].recognizer.onUp(e);
-
-        }
+        this._manager.onUp(e);
 
         this._target.removeEventListener("pointermove", this._pMove);
 
+
+        let upListeners = this._listeners[Shifter.Evt.UP];
+        let clickListeners = this._listeners[Shifter.Evt.CLICK];
+
+
+        if (clickListeners.length > 0 ) {
+            let t = this._manager.state.duration;
+            let dist = this._manager.state.pointerMovedDistance;
+
+            if (t < 300 && dist < params.clickInvalidDistance) this._sendEvt(Shifter.Evt.CLICK);
+        }
 
         //console.log(this._prevTransforms, this._funcs[0].transforms)
     }
@@ -172,6 +148,7 @@ export default class Shifter extends Dispatcher {
         for (let i = 0; i < this._funcs.length; i++) {
             this._funcs[i].onCancelled(e);
         }
+
         this._target.removeEventListener("pointermove", this._pMove);
         console.log("Shifter: evt cancelled")
     }
@@ -189,6 +166,23 @@ export default class Shifter extends Dispatcher {
 
     _dispatchEnd(e) {
 
+    }
+
+    _sendEvt(type) {
+
+        let evt = new ShifterEvent();
+        evt.target = this._target;
+        evt.type = type;
+
+        let props = this._manager.state;
+        let keys = Object.keys(props);
+
+        for (let i = 0; i < keys.length; i++) {
+            let k = keys[i];
+            evt[k] = props[k];
+        }
+
+        this.dispatch(type, evt)
     }
 
     /*
@@ -233,8 +227,8 @@ Shifter.Evt = {
     // PAN_END: "panEnd",
     // START: "start",
     // MOVE: "move",
-    // UP: "up",
-    // CANCELLED: "cancelled",
+    UP: "up",
+    CANCELLED: "cancelled",
     CLICK: "click",
     SWIPE: "swipe",
 };

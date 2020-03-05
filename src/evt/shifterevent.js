@@ -12,21 +12,6 @@ export default class ShifterEvent {
 
         this.type = "";
         this.target = null;
-        this.currentTarget = null;
-        this.clientX = 0;
-        this.clientY = 0;
-        this.layerX = 0;
-        this.layerY = 0;
-        this.offsetX = 0;
-        this.offsetY = 0;
-        this.pageX = 0;
-        this.pageY = 0;
-
-        this.duration = 0;
-        this.gesture = "";
-        this.velocityX = 0;
-        this.velocityY = 0;
-
     }
 
     static get Gestures() {

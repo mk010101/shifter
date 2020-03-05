@@ -42,108 +42,12 @@ class Dispatcher {
 
 }
 
-const gestures = {
-    SWIPE_UP: "swipe_up",
-    SWIPE_DOWN: "swipe_down",
-    SWIPE_LEFT: "swipe_left",
-    SWIPE_RIGHT: "swipe_right",
-};
-
-
-class ShifterEvent {
-
-    constructor(){
-
-        this.type = "";
-        this.target = null;
-        this.currentTarget = null;
-        this.clientX = 0;
-        this.clientY = 0;
-        this.layerX = 0;
-        this.layerY = 0;
-        this.offsetX = 0;
-        this.offsetY = 0;
-        this.pageX = 0;
-        this.pageY = 0;
-
-        this.duration = 0;
-        this.gesture = "";
-        this.velocityX = 0;
-        this.velocityY = 0;
-
-    }
-
-    static get Gestures() {
-        return gestures;
-    }
-
-}
-
-class Recognizer {
-
-
-    constructor(target) {
-
-        this._target = target;
-        this.type = "event";
-        this.evt = new ShifterEvent();
-        this.dur = 0;
-        this.startTime = 0;
-
-        this.canDispatch = false;
-        this.evtData = null;
-    }
-
-
-    onDown(e) {
-        this.startTime = Date.now();
-    }
-
-    onMove(e) {
-
-    }
-
-    onUp(e){
-        this.duration = Date.now() - this.startTime;
-    }
-
-    onCancelled(e) {
-        this.duration = Date.now() - this.startTime;
-    }
-
-    onWheel(e) {
-
-    }
-
-
-    destroy() {
-        this._target = null;
-    }
-
-    setEvt(e) {
-        this.evt.duration = this.duration;
-
-        this.evt.target = e.target;
-        this.evt.currentTarget = e.currentTarget;
-        this.evt.clientX = e.clientX;
-        this.evt.clientY = e.clientY;
-        this.evt.layerX = e.layerX;
-        this.evt.layerY = e.layerY;
-        this.evt.offsetX = e.offsetX;
-        this.evt.offsetY = e.offsetY;
-        this.evt.pageX = e.pageX;
-        this.evt.pageY = e.pageY;
-
-    }
-
-}
-
-class Action extends Recognizer {
+class Action {
 
 
     constructor(target, transforms) {
 
-        super(target);
+
         this._target = target;
         this.transforms = transforms;
         this._pointers = [];
@@ -151,7 +55,6 @@ class Action extends Recognizer {
 
 
     onDown(e) {
-        super.onDown(e);
         this._pointers.push(e);
     }
 
@@ -161,7 +64,7 @@ class Action extends Recognizer {
 
     onUp(e){
 
-        super.onUp(e);
+
         for (let i = this._pointers.length - 1; i >= 0; i--) {
 
             if (e.pointerId === this._pointers[i].pointerId) {
@@ -364,140 +267,6 @@ class Zoom extends Action {
 
 }
 
-class Click extends Recognizer {
-
-
-    constructor(target) {
-
-        super(target);
-        this.type = "click";
-        this._maxMoved = 15;
-        this._x0 = 0;
-        this._y0 = 0;
-
-    }
-
-
-    onDown(e) {
-        super.onDown(e);
-        this._x0 = e.clientX;
-        this._y0 = e.clientY;
-        this.canDispatch = false;
-    }
-
-    onMove(e) {
-
-    }
-
-    onUp(e){
-
-        super.onUp(e);
-
-        if (this.duration > 300) return;
-
-        let x = e.clientX;
-        let y = e.clientY;
-        let dist = Math.sqrt((x - this._x0) * (x - this._x0) + (y - this._y0) * (y - this._y0));
-        if (dist < this._maxMoved) {
-            this.setEvt(e);
-            this.evt.type = this.type;
-            this.canDispatch = true;
-            this._target.dispatch(this.type, this.evt);
-        }
-    }
-
-
-}
-
-function getAvgSpeed(arr) {
-
-    let vx = 0;
-    let vy = 0;
-
-    for (let i = 0; i < arr.length; i++) {
-        vx += arr[i].vx;
-        vy += arr[i].vy;
-    }
-
-    return {
-        vx: vx / arr.length,
-        vy: vy / arr.length,
-    }
-}
-
-class Swipe extends Recognizer {
-
-
-    constructor(target) {
-
-        super(target);
-        this.type = "swipe";
-        this.evt.type = this.type;
-        this._swipeSpeed = 5;
-        this._movesStack = [];
-        this._x0 = 0;
-        this._y0 = 0;
-
-    }
-
-
-    onDown(e) {
-        super.onDown(e);
-        this._movesStack = [];
-        this._x0 = e.clientX;
-        this._y0 = e.clientY;
-    }
-
-    onMove(e) {
-
-
-        this._movesStack.push({vx: e.clientX - this._x0, vy: e.clientY - this._y0});
-        if (this._movesStack.length > 10) {
-            this._movesStack.shift();
-        }
-        this._x0 = e.clientX;
-        this._y0 = e.clientY;
-    }
-
-    onUp(e) {
-
-        super.onUp(e);
-        if(this._movesStack.length === 0) return;
-        let {vx, vy} = getAvgSpeed(this._movesStack);
-        let absVx = Math.abs(vx);
-        let absVy = Math.abs(vy);
-
-        if (Math.abs(vx) < this._swipeSpeed && Math.abs(vy) < this._swipeSpeed) return;
-
-        if (absVx > absVy * 2) {
-            //console.log(vx)
-            this.setEvt(e);
-            if (vx < 0) {
-                this.evt.gesture = ShifterEvent.Gestures.SWIPE_LEFT;
-            } else {
-                this.evt.gesture = ShifterEvent.Gestures.SWIPE_RIGHT;
-            }
-            //this._target.dispatch(this.type, this.evt);
-        } else if (absVx < absVy * 2) {
-            //console.log(vx)
-            this.setEvt(e);
-            if (vy < 0) {
-                this.evt.gesture = ShifterEvent.Gestures.SWIPE_UP;
-            } else {
-                this.evt.gesture = ShifterEvent.Gestures.SWIPE_DOWN;
-            }
-            //this._target.dispatch(this.type, this.evt);
-        }
-
-        this.evt.velocityX = vx;
-        this.evt.velocityY = vy;
-        this._target.dispatch(this.type, this.evt);
-
-    }
-
-
-}
-
 /**
  * Takes a CSS 2D transform matrix and returns an array of values:
  * matrix( scaleX(), skewY(), skewX(), scaleY(), translateX(), translateY() )
@@ -515,7 +284,7 @@ function splitTransformMatrix(str) {
 
 //import Recognizer from "./recognizers/recognizer";
 
-class Manager {
+class Recognizer {
 
 
     constructor(target) {
@@ -524,13 +293,15 @@ class Manager {
         this._initMatrix = "";
         this._movesStack = [];
         this._initTime = 0;
-        this._x0 = 0;
-        this._y0 = 0;
-        this._x1 = 0;
-        this._y1 = 0;
+        this._velX0 = 0;
+        this._velY0 = 0;
+        this._velX1 = 0;
+        this._velY1 = 0;
+        this._pointerX0 = 0;
+        this._pointerY0 = 0;
         this._isRunning = false;
 
-        this.evtProps = {
+        this.state = {
             duration: 0,
             velocityX: 0,
             velocityY: 0,
@@ -538,6 +309,9 @@ class Manager {
             translatedX: 0,
             translatedY: 0,
             scaled: 1,
+            pointerMovedX: 0,
+            pointerMovedY: 0,
+            pointerMovedDistance: 0,
         };
 
         this.tick = this.tick.bind(this);
@@ -548,21 +322,23 @@ class Manager {
     onDown(e) {
         this._initTime = Date.now();
         this._movesStack = [];
-        this._x0 = e.clientX;
-        this._y0 = e.clientY;
+        this._velX0 = e.clientX;
+        this._velY0 = e.clientY;
+        this._pointerX0 = e.clientX;
+        this._pointerY0 = e.clientY;
         this._initMatrix = this._getMatrixString();
-        this.evtProps.targetTransformed = false;
-        this.evtProps.translatedX = 0;
-        this.evtProps.translatedY = 0;
-        this.evtProps.scaled = 0;
+        this.state.targetTransformed = false;
+        this.state.translatedX = 0;
+        this.state.translatedY = 0;
+        this.state.scaled = 0;
         this._isRunning = true;
         requestAnimationFrame(this.tick);
     }
 
     onMove(e) {
 
-        this._x1 = e.clientX;
-        this._y1 = e.clientY;
+        this._velX1 = e.clientX;
+        this._velY1 = e.clientY;
 
 
         //let {vx, vy} = getAvgSpeed(this._movesStack);
@@ -572,27 +348,30 @@ class Manager {
 
     tick() {
 
-        this._movesStack.push({vx: this._x1 - this._x0, vy: this._y1 - this._y0});
+        this._movesStack.push({vx: this._velX1 - this._velX0, vy: this._velY1 - this._velY0});
         if (this._movesStack.length > 20) {
             this._movesStack.shift();
         }
-        this._x0 = this._x1;
-        this._y0 = this._y1;
+        this._velX0 = this._velX1;
+        this._velY0 = this._velY1;
 
         if (this._isRunning) requestAnimationFrame(this.tick);
     }
 
 
     onUp(e) {
-        let {vx, vy} = getAvgSpeed$1(this._movesStack);
+        let {vx, vy} = getAvgSpeed(this._movesStack);
 
-        this.evtProps.duration = Date.now() - this._initTime;
-        this.evtProps.velocityX = vx || 0;
-        this.evtProps.velocityY = vy || 0;
+        this.state.duration = Date.now() - this._initTime;
+        this.state.velocityX = vx || 0;
+        this.state.velocityY = vy || 0;
         this._compareMtx();
-
         this._isRunning = false;
-        console.log(this.evtProps);
+
+        this.state.pointerMovedX = e.clientX - this._pointerX0;
+        this.state.pointerMovedY = e.clientY - this._pointerY0;
+        this.state.pointerMovedDistance = Math.sqrt(this.state.pointerMovedX * this.state.pointerMovedX + this.state.pointerMovedY * this.state.pointerMovedY);
+        console.log(this.state);
 
 
     }
@@ -611,21 +390,22 @@ class Manager {
 
     _compareMtx() {
         let newMatrix = this._getMatrixString();
-        if(this._initMatrix !== newMatrix) {
-            this.evtProps.targetTransformed = true;
+
+        if (this._initMatrix && this._initMatrix !== newMatrix) {
+            this.state.targetTransformed = true;
 
             let t0 = splitTransformMatrix(this._initMatrix);
             let t1 = splitTransformMatrix(newMatrix);
 
-            if (t0[4] !== t1[4]) this.evtProps.translatedX = t1[4] - t0[4];
-            if (t0[5] !== t1[5]) this.evtProps.translatedY = t1[5] - t0[5];
+            if (t0[4] !== t1[4]) this.state.translatedX = t1[4] - t0[4];
+            if (t0[5] !== t1[5]) this.state.translatedY = t1[5] - t0[5];
 
-            if (t0[0] !== t1[0]) this.evtProps.translatedY = t1[0] - t0[0];
+            if (t0[0] !== t1[0]) this.state.translatedY = t1[0] - t0[0];
 
         }
     }
 
-    _getMatrixString(){
+    _getMatrixString() {
         return window.getComputedStyle(this._target).transform;
     }
 
@@ -633,7 +413,7 @@ class Manager {
 }
 
 
-function getAvgSpeed$1(arr) {
+function getAvgSpeed(arr) {
 
     let vx = 0;
     let vy = 0;
@@ -649,6 +429,41 @@ function getAvgSpeed$1(arr) {
     }
 }
 
+/*
+this.evt.target = e.target;
+        this.evt.currentTarget = e.currentTarget;
+        this.evt.clientX = e.clientX;
+        this.evt.clientY = e.clientY;
+        this.evt.layerX = e.layerX;
+        this.evt.layerY = e.layerY;
+        this.evt.offsetX = e.offsetX;
+        this.evt.offsetY = e.offsetY;
+        this.evt.pageX = e.pageX;
+        this.evt.pageY = e.pageY;
+ */
+
+const gestures = {
+    SWIPE_UP: "swipe_up",
+    SWIPE_DOWN: "swipe_down",
+    SWIPE_LEFT: "swipe_left",
+    SWIPE_RIGHT: "swipe_right",
+};
+
+
+class ShifterEvent {
+
+    constructor(){
+
+        this.type = "";
+        this.target = null;
+    }
+
+    static get Gestures() {
+        return gestures;
+    }
+
+}
+
 const CssProps = {
     userSelect: "none",
     webkitTouchCallout: "none",
@@ -657,9 +472,9 @@ const CssProps = {
     touchAction: "none"
 };
 
-const Events = {
-    click: Click,
-    swipe: Swipe,
+const params = {
+    clickInvalidDistance: 5,
+
 };
 
 
@@ -673,35 +488,14 @@ class Shifter extends Dispatcher {
         this._target = target;
         this._funcs = [];
         this._gestures = [];
-        this._recognizers = [];
         this._disabled = false;
         this._isPassiveEvt = true;
         this._prevTransforms = [];
 
-        this._manager = new Manager(target);
+        this._manager = new Recognizer(target);
 
         this._init(funcs);
 
-    }
-
-
-    on(event, listener) {
-
-        let evt = {
-            name: "",
-            evt: null
-        };
-
-        if (Events[event]) {
-            evt.name = event;
-            evt.recognizer = new Events[event](this);
-            this._recognizers.push(evt);
-            super.on(evt.name, listener);
-        } else {
-            super.on(event, listener);
-        }
-
-        return this;
     }
 
 
@@ -746,8 +540,6 @@ class Shifter extends Dispatcher {
 
     _pDown(e) {
 
-        this._manager.onDown(e);
-
         for (let i = 0; i < this._funcs.length; i++) {
             this._funcs[i].onDown(e);
         }
@@ -756,9 +548,7 @@ class Shifter extends Dispatcher {
             this._prevTransforms = this._funcs[0].transforms.concat();
         }
 
-        for (let i = 0; i < this._recognizers.length; i++) {
-            this._recognizers[i].recognizer.onDown(e);
-        }
+        this._manager.onDown(e);
 
         this._target.addEventListener("pointermove", this._pMove, {passive: this._isPassiveEvt});
 
@@ -767,35 +557,37 @@ class Shifter extends Dispatcher {
 
     _pMove(e) {
 
-        this._manager.onMove(e);
-
         for (let i = 0; i < this._funcs.length; i++) {
             this._funcs[i].onMove(e);
         }
-
-        for (let i = 0; i < this._recognizers.length; i++) {
-            this._recognizers[i].recognizer.onMove(e);
-        }
-
         this._setTransforms();
+
+        this._manager.onMove(e);
+
     }
 
 
     _pUp(e) {
 
-        this._manager.onUp(e);
-
         for (let i = 0; i < this._funcs.length; i++) {
             this._funcs[i].onUp(e);
         }
 
-        for (let i = 0; i < this._recognizers.length; i++) {
-            this._recognizers[i].recognizer.onUp(e);
-
-        }
+        this._manager.onUp(e);
 
         this._target.removeEventListener("pointermove", this._pMove);
 
+
+        let upListeners = this._listeners[Shifter.Evt.UP];
+        let clickListeners = this._listeners[Shifter.Evt.CLICK];
+
+
+        if (clickListeners.length > 0 ) {
+            let t = this._manager.state.duration;
+            let dist = this._manager.state.pointerMovedDistance;
+
+            if (t < 300 && dist < params.clickInvalidDistance) this._sendEvt(Shifter.Evt.CLICK);
+        }
 
         //console.log(this._prevTransforms, this._funcs[0].transforms)
     }
@@ -808,6 +600,7 @@ class Shifter extends Dispatcher {
         for (let i = 0; i < this._funcs.length; i++) {
             this._funcs[i].onCancelled(e);
         }
+
         this._target.removeEventListener("pointermove", this._pMove);
         console.log("Shifter: evt cancelled");
     }
@@ -825,6 +618,23 @@ class Shifter extends Dispatcher {
 
     _dispatchEnd(e) {
 
+    }
+
+    _sendEvt(type) {
+
+        let evt = new ShifterEvent();
+        evt.target = this._target;
+        evt.type = type;
+
+        let props = this._manager.state;
+        let keys = Object.keys(props);
+
+        for (let i = 0; i < keys.length; i++) {
+            let k = keys[i];
+            evt[k] = props[k];
+        }
+
+        this.dispatch(type, evt);
     }
 
     /*
@@ -869,8 +679,8 @@ Shifter.Evt = {
     // PAN_END: "panEnd",
     // START: "start",
     // MOVE: "move",
-    // UP: "up",
-    // CANCELLED: "cancelled",
+    UP: "up",
+    CANCELLED: "cancelled",
     CLICK: "click",
     SWIPE: "swipe",
 };
