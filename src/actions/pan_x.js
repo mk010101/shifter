@@ -13,6 +13,7 @@ export default class Pan_X extends Action {
         this._canPan = true;
         this._panX0 = 0;
         this._panY0 = 0;
+        this._x0 = 0;
     }
 
 
@@ -20,6 +21,7 @@ export default class Pan_X extends Action {
         super.onDown(e);
         this._panX0 = e.clientX - this.transforms[4];
         this._panY0 = e.clientY - this.transforms[5];
+        this._x0 = this.transforms[4];
         this._canPan = true;
     }
 
@@ -61,7 +63,14 @@ export default class Pan_X extends Action {
 
     onUp(e) {
         super.onUp(e);
+        /*
+        if (this._x0 !== this.transforms[4] && this._isPanningX) {
+            this.evt.type = "pan_x_end";
+            this.setEvt(e);
+            this._target.dispatch("pan_x_end", this.evt);
+        }
         this._isPanningX = false;
+         */
     }
 
     _lockScroll() {

@@ -42,11 +42,105 @@ class Dispatcher {
 
 }
 
-class Action {
+const gestures = {
+    SWIPE_UP: "swipe_up",
+    SWIPE_DOWN: "swipe_down",
+    SWIPE_LEFT: "swipe_left",
+    SWIPE_RIGHT: "swipe_right",
+};
+
+
+class ShifterEvent {
+
+    constructor(){
+
+        this.type = "";
+        this.target = null;
+        this.currentTarget = null;
+        this.clientX = 0;
+        this.clientY = 0;
+        this.layerX = 0;
+        this.layerY = 0;
+        this.offsetX = 0;
+        this.offsetY = 0;
+        this.pageX = 0;
+        this.pageY = 0;
+
+        this.duration = 0;
+        this.gesture = "";
+        this.velocityX = 0;
+        this.velocityY = 0;
+
+    }
+
+    static get Gestures() {
+        return gestures;
+    }
+
+}
+
+class Recognizer {
+
+
+    constructor(target) {
+
+        this._target = target;
+        this.type = "event";
+        this.evt = new ShifterEvent();
+        this.dur = 0;
+        this.startTime = 0;
+    }
+
+
+    onDown(e) {
+        this.startTime = Date.now();
+    }
+
+    onMove(e) {
+
+    }
+
+    onUp(e){
+        this.duration = Date.now() - this.startTime;
+    }
+
+    onCancelled(e) {
+        this.duration = Date.now() - this.startTime;
+    }
+
+    onWheel(e) {
+
+    }
+
+
+    destroy() {
+        this._target = null;
+    }
+
+    setEvt(e) {
+        this.evt.duration = this.duration;
+
+        this.evt.target = e.target;
+        this.evt.currentTarget = e.currentTarget;
+        this.evt.clientX = e.clientX;
+        this.evt.clientY = e.clientY;
+        this.evt.layerX = e.layerX;
+        this.evt.layerY = e.layerY;
+        this.evt.offsetX = e.offsetX;
+        this.evt.offsetY = e.offsetY;
+        this.evt.pageX = e.pageX;
+        this.evt.pageY = e.pageY;
+
+    }
+
+}
+
+class Action extends Recognizer {
 
 
     constructor(target, transforms) {
 
+        super(target);
         this._target = target;
         this.transforms = transforms;
         this._pointers = [];
@@ -54,6 +148,7 @@ class Action {
 
 
     onDown(e) {
+        super.onDown(e);
         this._pointers.push(e);
     }
 
@@ -63,6 +158,7 @@ class Action {
 
     onUp(e){
 
+        super.onUp(e);
         for (let i = this._pointers.length - 1; i >= 0; i--) {
 
             if (e.pointerId === this._pointers[i].pointerId) {
@@ -138,6 +234,7 @@ class Pan_X extends Action {
         this._canPan = true;
         this._panX0 = 0;
         this._panY0 = 0;
+        this._x0 = 0;
     }
 
 
@@ -145,6 +242,7 @@ class Pan_X extends Action {
         super.onDown(e);
         this._panX0 = e.clientX - this.transforms[4];
         this._panY0 = e.clientY - this.transforms[5];
+        this._x0 = this.transforms[4];
         this._canPan = true;
     }
 
@@ -186,7 +284,14 @@ class Pan_X extends Action {
 
     onUp(e) {
         super.onUp(e);
+        /*
+        if (this._x0 !== this.transforms[4] && this._isPanningX) {
+            this.evt.type = "pan_x_end";
+            this.setEvt(e);
+            this._target.dispatch("pan_x_end", this.evt);
+        }
         this._isPanningX = false;
+         */
     }
 
     _lockScroll() {
@@ -253,97 +358,6 @@ class Zoom extends Action {
         this.transforms[3] = this._scale;
     }
 
-
-}
-
-const gestures = {
-    SWIPE_UP: "swipe_up",
-    SWIPE_DOWN: "swipe_down",
-    SWIPE_LEFT: "swipe_left",
-    SWIPE_RIGHT: "swipe_right",
-};
-
-
-class ShifterEvent {
-
-    constructor(){
-
-        this.type = "";
-        this.target = null;
-        this.currentTarget = null;
-        this.clientX = 0;
-        this.clientY = 0;
-        this.layerX = 0;
-        this.layerY = 0;
-        this.offsetX = 0;
-        this.offsetY = 0;
-        this.pageX = 0;
-        this.pageY = 0;
-
-        this.duration = 0;
-        this.gesture = "";
-
-    }
-
-    static get Gestures() {
-        return gestures;
-    }
-
-}
-
-class Recognizer {
-
-
-    constructor(target) {
-
-        this._target = target;
-        this.type = "event";
-        this.evt = new ShifterEvent();
-        this.dur = 0;
-        this.startTime = 0;
-    }
-
-
-    onDown(e) {
-        this.startTime = Date.now();
-    }
-
-    onMove(e) {
-
-    }
-
-    onUp(e){
-        this.duration = Date.now() - this.startTime;
-    }
-
-    onCancelled(e) {
-        this.duration = Date.now() - this.startTime;
-    }
-
-    onWheel(e) {
-
-    }
-
-
-    destroy() {
-        this._target = null;
-    }
-
-    setEvt(e) {
-        this.evt.duration = this.duration;
-
-        this.evt.target = e.target;
-        this.evt.currentTarget = e.currentTarget;
-        this.evt.clientX = e.clientX;
-        this.evt.clientY = e.clientY;
-        this.evt.layerX = e.layerX;
-        this.evt.layerY = e.layerY;
-        this.evt.offsetX = e.offsetX;
-        this.evt.offsetY = e.offsetY;
-        this.evt.pageX = e.pageX;
-        this.evt.pageY = e.pageY;
-
-    }
 
 }
 
@@ -504,18 +518,6 @@ const Events = {
     swipe: Swipe,
 };
 
-/*
-this.Evt = {
-    target: null,
-    distX: 0,
-    distY: 0,
-    dist: 0,
-    duration: 0,
-    speedX: 0,
-    speedY: 0,
-    speed: 0
-};
- */
 
 class Shifter extends Dispatcher {
 
@@ -530,6 +532,7 @@ class Shifter extends Dispatcher {
         this._events = [];
         this._disabled = false;
         this._isPassiveEvt = true;
+        this._prevTransforms = [];
 
         this._init(funcs);
 
@@ -547,6 +550,8 @@ class Shifter extends Dispatcher {
             evt.evt = new Events[event](this);
             this._events.push(evt);
             super.on(evt.name, listener);
+        } else {
+            super.on(event, listener);
         }
 
         return this;
@@ -572,7 +577,7 @@ class Shifter extends Dispatcher {
         let transforms = this._parseTargetTransforms();
 
         for (let i = 0; i < funcs.length; i++) {
-            this._funcs.push(new funcs[i](this._target, transforms));
+            this._funcs.push(new funcs[i](this, transforms));
             if (funcs[i] === Zoom) {
                 this._target.addEventListener("wheel", this._onWheel);
             }
@@ -596,6 +601,10 @@ class Shifter extends Dispatcher {
 
         for (let i = 0; i < this._funcs.length; i++) {
             this._funcs[i].onDown(e);
+        }
+
+        if (this._funcs.length > 0) {
+            this._prevTransforms = this._funcs[0].transforms.concat();
         }
 
         for (let i = 0; i < this._events.length; i++) {
@@ -632,6 +641,8 @@ class Shifter extends Dispatcher {
         }
 
         this._target.removeEventListener("pointermove", this._pMove);
+
+        console.log(this._prevTransforms, this._funcs[0].transforms);
     }
 
 
@@ -655,7 +666,7 @@ class Shifter extends Dispatcher {
     }
 
     /*
-        matrix( scaleX(), skewY(), skewX(), scaleY(), translateX(), translateY() )
+        matrix( scaleX(0), skewY(1), skewX(2), scaleY(3), translateX(4), translateY(5) )
      */
 
     _setTransforms() {

@@ -24,6 +24,8 @@ export default class ShifterEvent {
 
         this.duration = 0;
         this.gesture = "";
+        this.velocityX = 0;
+        this.velocityY = 0;
 
     }
 

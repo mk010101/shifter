@@ -24,18 +24,6 @@ const Events = {
     swipe: Swipe,
 };
 
-/*
-this.Evt = {
-    target: null,
-    distX: 0,
-    distY: 0,
-    dist: 0,
-    duration: 0,
-    speedX: 0,
-    speedY: 0,
-    speed: 0
-};
- */
 
 export default class Shifter extends Dispatcher {
 
@@ -50,6 +38,7 @@ export default class Shifter extends Dispatcher {
         this._events = [];
         this._disabled = false;
         this._isPassiveEvt = true;
+        this._prevTransforms = [];
 
         this._init(funcs);
 
@@ -67,6 +56,8 @@ export default class Shifter extends Dispatcher {
             evt.evt = new Events[event](this);
             this._events.push(evt);
             super.on(evt.name, listener);
+        } else {
+            super.on(event, listener);
         }
 
         return this;
@@ -92,7 +83,7 @@ export default class Shifter extends Dispatcher {
         let transforms = this._parseTargetTransforms();
 
         for (let i = 0; i < funcs.length; i++) {
-            this._funcs.push(new funcs[i](this._target, transforms));
+            this._funcs.push(new funcs[i](this, transforms));
             if (funcs[i] === Zoom) {
                 this._target.addEventListener("wheel", this._onWheel);
             }
@@ -116,6 +107,10 @@ export default class Shifter extends Dispatcher {
 
         for (let i = 0; i < this._funcs.length; i++) {
             this._funcs[i].onDown(e);
+        }
+
+        if (this._funcs.length > 0) {
+            this._prevTransforms = this._funcs[0].transforms.concat();
         }
 
         for (let i = 0; i < this._events.length; i++) {
@@ -152,6 +147,8 @@ export default class Shifter extends Dispatcher {
         }
 
         this._target.removeEventListener("pointermove", this._pMove);
+
+        console.log(this._prevTransforms, this._funcs[0].transforms)
     }
 
 
@@ -175,7 +172,7 @@ export default class Shifter extends Dispatcher {
     }
 
     /*
-        matrix( scaleX(), skewY(), skewX(), scaleY(), translateX(), translateY() )
+        matrix( scaleX(0), skewY(1), skewX(2), scaleY(3), translateX(4), translateY(5) )
      */
 
     _setTransforms() {

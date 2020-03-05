@@ -92,6 +92,8 @@ class PagesViewer {
         this._shifter.on(Shifter.Evt.SWIPE, this._onSwipe);
         this._shifter.on(Shifter.Evt.CANCELLED, this._onShifterCancelled);
 
+        this._shifter.on("pan_x_end", (e)=> console.log(e))
+
     }
 
     _addPageRight(pageNumId) {
@@ -122,10 +124,6 @@ class PagesViewer {
         let speed = this._shifter.speedX;
         let minSpeed = 3;
 
-        //console.log(speed)
-
-        //console.log(this._shifter.gestureDuration)
-        //console.log(speed)
 
         let result = this._getNearestPage();
 
