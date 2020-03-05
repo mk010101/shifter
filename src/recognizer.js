@@ -104,6 +104,7 @@ export default class Recognizer {
 
     onCancelled(e) {
         this._isRunning = false;
+        this.onUp(e);
     }
 
     /*

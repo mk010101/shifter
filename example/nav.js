@@ -90,7 +90,7 @@ class PagesViewer {
 
         //this._shifter.on(Shifter.Evt.START, this._onShifterStart);
         this._shifter.on(Shifter.Evt.TARGET_MOVED, this._onTargetMoved);
-        //this._shifter.on(Shifter.Evt.CANCELLED, this._onShifterCancelled);
+        this._shifter.on(Shifter.Evt.CANCELLED, this._onShifterCancelled);
 
         //this._shifter.on("pan_x_end", (e)=> console.log(e))
 
@@ -124,24 +124,18 @@ class PagesViewer {
 
         let result = this._getNearestPage();
 
-        if (movedX > 1 && Math.abs(velocity) > 0) {
-
-
+        if (movedX > 5 && Math.abs(velocity) > 1) {
 
             if (velocity < 0 && result.index < this._children.length - 1) {
                 this._move(this._children[result.index + 1]);
-            }
-
-            /*
-            /// User swipe slow ------
-            if (velocity < -minSpeed && result.index < this._children.length - 1) {
-                this._move(this._children[result.index + 1]);
-            } else if (velocity > minSpeed && result.index > 0) {
+            } else if (velocity > 0 && result.index > 0) {
                 this._move(this._children[result.index - 1]);
             } else {
                 this._move(result.page);
             }
-             */
+
+        } else {
+            this._move(result.page);
         }
     }
 
