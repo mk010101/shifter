@@ -3,12 +3,20 @@ const bSync = require('browser-sync').create();
 const rollup = require("rollup");
 
 
+
+
+
+
 gulp.task('bSync', function() {
     bSync.init({
         server: {
             baseDir: "./example",
-            directory: true
+            directory: true,
         },
+        //host: process.env.BSYNC_HOST || undefined,
+       //proxy: "192.168.0.13",
+       //proxy: "b-sync",
+        port: 3030,
 
     });
 });
@@ -35,14 +43,14 @@ gulp.task('watch', ()=> {
  ======================================================================================*/
 
 const inputOptions = {
-    input: "./src/Shifter.js"
+    input: "./src/shifter.js"
 };
 
 
 
 const outputOptions = {
     format: "esm", // required
-    file: "./example/libs/Shifter.js",
+    file: "./example/libs/shifter.js",
     //file: "shifter.js",
     //dir :"./example/libs",
     name: "Shifter", // exposed name of the lib.
@@ -52,12 +60,15 @@ const outputOptions = {
 
 gulp.task('package', ()=> {
 
-    return new Promise(async resolve => {
+    return new Promise(async (resolve) => {
 
 
-        const bundle = await rollup.rollup(inputOptions);
+        const bundle = await rollup.rollup(inputOptions)
+            .catch((err)=> {console.log(err)});
 
-        await bundle.write(outputOptions);
+
+        if (bundle) await bundle.write(outputOptions);
+
 
         bSync.reload({stream: false});
 
@@ -66,6 +77,30 @@ gulp.task('package', ()=> {
     });
 
 
+
+});
+
+
+gulp.task('web', () => {
+
+    return new Promise(async (resolve) => {
+
+        const bundle = await rollup.rollup({input: "./src/shifter.js"})
+            .catch((err) => {
+                console.log(err)
+            });
+
+        if (bundle) await bundle.write({
+            format: "umd", // required
+            //format: "esm", // required
+            file: "./build/umd/shifter.js",
+            name: "shifter", // exposed name of the lib.
+            exports: "named",
+            globals: "window"
+        });
+        bSync.reload({stream: false});
+        resolve();
+    });
 
 });
 

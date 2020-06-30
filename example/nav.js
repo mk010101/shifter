@@ -59,7 +59,7 @@ class PagesViewer {
 
     _init() {
         this._onShifterStart = this._onShifterStart.bind(this);
-        this._onPanXEnd = this._onPanXEnd.bind(this);
+        this._onTargetMoved = this._onTargetMoved.bind(this);
         this._onShifterCancelled = this._onShifterCancelled.bind(this);
     }
 
@@ -89,8 +89,10 @@ class PagesViewer {
         this._shifter = new Shifter(this._html, [Shifter.Func.PAN_X]);
 
         //this._shifter.on(Shifter.Evt.START, this._onShifterStart);
-        this._shifter.on(Shifter.Evt.PAN_X_END, this._onPanXEnd);
+        this._shifter.on(Shifter.Evt.TARGET_MOVED, this._onTargetMoved);
         this._shifter.on(Shifter.Evt.CANCELLED, this._onShifterCancelled);
+
+        //this._shifter.on("pan_x_end", (e)=> console.log(e))
 
     }
 
@@ -114,24 +116,24 @@ class PagesViewer {
         glide.remove(this._html);
     }
 
-    _onPanXEnd() {
+    _onTargetMoved(e) {
 
 
-        let speed = this._shifter.speedX;
-        let minSpeed = 3;
-
-        //console.log(speed)
-
-        //console.log(this._shifter.gestureDuration)
-        //console.log(speed)
+        let velocity = e.velocityX;
+        let movedX = Math.abs(e.panX);
 
         let result = this._getNearestPage();
 
-        /// User swipe slow ------
-        if (speed < -minSpeed && result.index < this._children.length - 1) {
-            this._move(this._children[result.index + 1]);
-        } else if (speed > minSpeed && result.index > 0) {
-            this._move(this._children[result.index - 1]);
+        if (movedX > 5 && Math.abs(velocity) > 1) {
+
+            if (velocity < 0 && result.index < this._children.length - 1) {
+                this._move(this._children[result.index + 1]);
+            } else if (velocity > 0 && result.index > 0) {
+                this._move(this._children[result.index - 1]);
+            } else {
+                this._move(result.page);
+            }
+
         } else {
             this._move(result.page);
         }
@@ -145,7 +147,7 @@ class PagesViewer {
         this._shifter.disabled = true;
         let pos = this._html.getBoundingClientRect().left - page.boundsX;
         glide.to(this._html, 300,
-            {t: {translateX: pos}},
+            {m: [1, 0, 0, 1, pos, 0]},
             {ease: glide.Ease.quadOut})
             .on("end", () => {
                 this._shifter.disabled = false;
