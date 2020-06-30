@@ -262,6 +262,14 @@ class Zoom extends Action {
 
     }
 
+    set zoom(value) {
+        if (value < this.minZoom) value = this.minZoom;
+        if (value > this.maxZoom) value = this.maxZoom;
+        this._scale = value;
+        this.transforms[0] = this._scale;
+        this.transforms[3] = this._scale;
+    }
+
     onWheel(e) {
         this._scale += e.deltaY * -0.001;
         this._scale = Math.min(Math.max(this.minZoom, this._scale), this.maxZoom);
@@ -506,6 +514,11 @@ class Shifter extends Dispatcher {
 
     setMaxZoom(value) {
         this._setProp(Zoom, "maxZoom", value);
+    }
+
+    setZoom(value) {
+        this._setProp(Zoom, "zoom", value);
+        this._setTransforms();
     }
 
     _setProp(func, prop, value) {

@@ -54,6 +54,11 @@ export default class Shifter extends Dispatcher {
         this._setProp(Zoom, "maxZoom", value);
     }
 
+    setZoom(value) {
+        this._setProp(Zoom, "zoom", value);
+        this._setTransforms();
+    }
+
     _setProp(func, prop, value) {
 
         for (let i = 0; i < this._funcs.length; i++) {

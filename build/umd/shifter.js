@@ -53,7 +53,7 @@
 
         constructor(target, transforms) {
 
-
+            this.name = "action";
             this._target = target;
             this.transforms = transforms;
             this._pointers = [];
@@ -106,6 +106,7 @@
         constructor(target, transforms) {
 
             super(target, transforms);
+            this.name = "pan";
             this._x0 = transforms[4];
             this._y0 = transforms[5];
 
@@ -143,7 +144,7 @@
         constructor(target, transforms) {
 
             super(target, transforms);
-
+            this.name = "pan_x";
             this._detectPanDist = 10;
             this._isPanningX = false;
             this._canPan = true;
@@ -222,10 +223,11 @@
         constructor(target, transforms) {
 
             super(target, transforms);
-            this._minZoom = .5;
-            this._maxZoom = 3;
+            this.name = "zoom";
+            this.minZoom = .5;
+            this.maxZoom = 3;
             this._pinchDist0 = 0;
-            this._zoomSpeed = 0.025;
+            this.zoomSpeed = 0.025;
             this._scale = transforms[0];
         }
 
@@ -253,10 +255,10 @@
                 let y1 = this._pointers[1].clientY;
                 let dist = Math.sqrt((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1));
 
-                if (dist > this._pinchDist0 && this._scale <= this._maxZoom) {
-                    this._scale += this._zoomSpeed;
-                } else if (dist < this._pinchDist0 && this._scale >= this._minZoom) {
-                    this._scale -= this._zoomSpeed;
+                if (dist > this._pinchDist0 && this._scale <= this.maxZoom) {
+                    this._scale += this.zoomSpeed;
+                } else if (dist < this._pinchDist0 && this._scale >= this.minZoom) {
+                    this._scale -= this.zoomSpeed;
                 }
                 this._pinchDist0 = dist;
                 this.transforms[0] = this._scale;
@@ -268,7 +270,7 @@
 
         onWheel(e) {
             this._scale += e.deltaY * -0.001;
-            this._scale = Math.min(Math.max(this._minZoom, this._scale), this._maxZoom);
+            this._scale = Math.min(Math.max(this.minZoom, this._scale), this.maxZoom);
             this.transforms[0] = this._scale;
             this.transforms[3] = this._scale;
         }
@@ -501,14 +503,26 @@
             this._manager = new Recognizer(target);
 
             this._init(funcs);
-            //console.log(this._funcs.indexOf(Zoom))
 
         }
 
-        setMinZoom() {
-
+        setMinZoom(value) {
+            this._setProp(Zoom, "minZoom", value);
         }
 
+        setMaxZoom(value) {
+            this._setProp(Zoom, "maxZoom", value);
+        }
+
+        _setProp(func, prop, value) {
+
+            for (let i = 0; i < this._funcs.length; i++) {
+                if (this._funcs[i] instanceof func) {
+                    this._funcs[i][prop] = value;
+                    break;
+                }
+            }
+        }
 
         _init(funcs) {
 
@@ -590,9 +604,9 @@
             this._target.removeEventListener("pointermove", this._pMove);
 
 
-            this._sendEvt(Shifter.Evt.UP);
+            this._sendEvt(Shifter.Evt.UP, e.target);
 
-            if (this._manager.state.targetMoved) this._sendEvt(Shifter.Evt.TARGET_MOVED);
+            if (this._manager.state.targetMoved) this._sendEvt(Shifter.Evt.TARGET_MOVED, e.target);
 
             let clickListeners = this._listeners[Shifter.Evt.CLICK];
             if (clickListeners && clickListeners.length > 0) {
@@ -617,7 +631,7 @@
 
             this._target.removeEventListener("pointermove", this._pMove);
 
-            this._sendEvt(Shifter.Evt.CANCELLED);
+            this._sendEvt(Shifter.Evt.CANCELLED, e.target);
 
         }
 
