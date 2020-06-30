@@ -5,7 +5,7 @@ export default class Action {
 
     constructor(target, transforms) {
 
-
+        this.name = "action";
         this._target = target;
         this.transforms = transforms;
         this._pointers = [];

@@ -47,7 +47,7 @@ class Action {
 
     constructor(target, transforms) {
 
-
+        this.name = "action";
         this._target = target;
         this.transforms = transforms;
         this._pointers = [];
@@ -100,6 +100,7 @@ class Pan extends Action {
     constructor(target, transforms) {
 
         super(target, transforms);
+        this.name = "pan";
         this._x0 = transforms[4];
         this._y0 = transforms[5];
 
@@ -137,7 +138,7 @@ class Pan_X extends Action {
     constructor(target, transforms) {
 
         super(target, transforms);
-
+        this.name = "pan_x";
         this._detectPanDist = 10;
         this._isPanningX = false;
         this._canPan = true;
@@ -216,10 +217,11 @@ class Zoom extends Action {
     constructor(target, transforms) {
 
         super(target, transforms);
-        this._minZoom = .3;
-        this._maxZoom = 3;
+        this.name = "zoom";
+        this.minZoom = .5;
+        this.maxZoom = 3;
         this._pinchDist0 = 0;
-        this._zoomSpeed = 0.025;
+        this.zoomSpeed = 0.025;
         this._scale = transforms[0];
     }
 
@@ -247,10 +249,10 @@ class Zoom extends Action {
             let y1 = this._pointers[1].clientY;
             let dist = Math.sqrt((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1));
 
-            if (dist > this._pinchDist0 && this._scale <= this._maxZoom) {
-                this._scale += this._zoomSpeed;
-            } else if (dist < this._pinchDist0 && this._scale >= this._minZoom) {
-                this._scale -= this._zoomSpeed;
+            if (dist > this._pinchDist0 && this._scale <= this.maxZoom) {
+                this._scale += this.zoomSpeed;
+            } else if (dist < this._pinchDist0 && this._scale >= this.minZoom) {
+                this._scale -= this.zoomSpeed;
             }
             this._pinchDist0 = dist;
             this.transforms[0] = this._scale;
@@ -262,7 +264,7 @@ class Zoom extends Action {
 
     onWheel(e) {
         this._scale += e.deltaY * -0.001;
-        this._scale = Math.min(Math.max(this._minZoom, this._scale), this._maxZoom);
+        this._scale = Math.min(Math.max(this.minZoom, this._scale), this.maxZoom);
         this.transforms[0] = this._scale;
         this.transforms[3] = this._scale;
     }
@@ -498,6 +500,23 @@ class Shifter extends Dispatcher {
 
     }
 
+    setMinZoom(value) {
+        this._setProp(Zoom, "minZoom", value);
+    }
+
+    setMaxZoom(value) {
+        this._setProp(Zoom, "maxZoom", value);
+    }
+
+    _setProp(func, prop, value) {
+
+        for (let i = 0; i < this._funcs.length; i++) {
+            if (this._funcs[i] instanceof func) {
+                this._funcs[i][prop] = value;
+                break;
+            }
+        }
+    }
 
     _init(funcs) {
 
@@ -579,16 +598,17 @@ class Shifter extends Dispatcher {
         this._target.removeEventListener("pointermove", this._pMove);
 
 
-        this._sendEvt(Shifter.Evt.UP);
+        this._sendEvt(Shifter.Evt.UP, e.target);
 
-        if (this._manager.state.targetMoved) this._sendEvt(Shifter.Evt.TARGET_MOVED);
+        if (this._manager.state.targetMoved) this._sendEvt(Shifter.Evt.TARGET_MOVED, e.target);
 
         let clickListeners = this._listeners[Shifter.Evt.CLICK];
         if (clickListeners && clickListeners.length > 0) {
             let t = this._manager.state.duration;
             let dist = this._manager.state.pointerMovedDistance;
             if (t < 300 && dist < params.clickInvalidDistance) {
-                this._sendEvt(Shifter.Evt.CLICK);
+                this._sendEvt(Shifter.Evt.CLICK, e.target);
+
             }
         }
 
@@ -605,7 +625,7 @@ class Shifter extends Dispatcher {
 
         this._target.removeEventListener("pointermove", this._pMove);
 
-        this._sendEvt(Shifter.Evt.CANCELLED);
+        this._sendEvt(Shifter.Evt.CANCELLED, e.target);
 
     }
 
@@ -624,12 +644,12 @@ class Shifter extends Dispatcher {
 
     }
 
-    _sendEvt(type) {
+    _sendEvt(type, target) {
 
         if (this._listeners[type] && this._listeners[type].length > 0) {
 
             let evt = new ShifterEvent();
-            evt.target = this._target;
+            evt.target = target;
             evt.type = type;
 
             let props = this._manager.state;
@@ -640,7 +660,7 @@ class Shifter extends Dispatcher {
                 evt[k] = props[k];
             }
 
-            console.log(evt);
+            //console.log(evt)
             this.dispatch(type, evt);
         }
     }

@@ -6,6 +6,7 @@ export default class Pan extends Action {
     constructor(target, transforms) {
 
         super(target, transforms);
+        this.name = "pan";
         this._x0 = transforms[4];
         this._y0 = transforms[5];
 

@@ -46,6 +46,23 @@ export default class Shifter extends Dispatcher {
 
     }
 
+    setMinZoom(value) {
+        this._setProp(Zoom, "minZoom", value);
+    }
+
+    setMaxZoom(value) {
+        this._setProp(Zoom, "maxZoom", value);
+    }
+
+    _setProp(func, prop, value) {
+
+        for (let i = 0; i < this._funcs.length; i++) {
+            if (this._funcs[i] instanceof func) {
+                this._funcs[i][prop] = value;
+                break;
+            }
+        }
+    }
 
     _init(funcs) {
 
@@ -129,16 +146,17 @@ export default class Shifter extends Dispatcher {
         this._target.removeEventListener("pointermove", this._pMove);
 
 
-        this._sendEvt(Shifter.Evt.UP);
+        this._sendEvt(Shifter.Evt.UP, e.target);
 
-        if (this._manager.state.targetMoved) this._sendEvt(Shifter.Evt.TARGET_MOVED);
+        if (this._manager.state.targetMoved) this._sendEvt(Shifter.Evt.TARGET_MOVED, e.target);
 
         let clickListeners = this._listeners[Shifter.Evt.CLICK];
         if (clickListeners && clickListeners.length > 0) {
             let t = this._manager.state.duration;
             let dist = this._manager.state.pointerMovedDistance;
             if (t < 300 && dist < params.clickInvalidDistance) {
-                this._sendEvt(Shifter.Evt.CLICK);
+                this._sendEvt(Shifter.Evt.CLICK, e.target);
+
             }
         }
 
@@ -155,7 +173,7 @@ export default class Shifter extends Dispatcher {
 
         this._target.removeEventListener("pointermove", this._pMove);
 
-        this._sendEvt(Shifter.Evt.CANCELLED);
+        this._sendEvt(Shifter.Evt.CANCELLED, e.target);
 
     }
 
@@ -174,12 +192,12 @@ export default class Shifter extends Dispatcher {
 
     }
 
-    _sendEvt(type) {
+    _sendEvt(type, target) {
 
         if (this._listeners[type] && this._listeners[type].length > 0) {
 
             let evt = new ShifterEvent();
-            evt.target = this._target;
+            evt.target = target;
             evt.type = type;
 
             let props = this._manager.state;
@@ -190,7 +208,7 @@ export default class Shifter extends Dispatcher {
                 evt[k] = props[k];
             }
 
-            console.log(evt)
+            //console.log(evt)
             this.dispatch(type, evt)
         }
     }

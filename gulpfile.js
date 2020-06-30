@@ -4,20 +4,6 @@ const rollup = require("rollup");
 
 
 
-/*
-const express = require('express');
-const app = express();
-gulp.task('server', ()=> {
-    //app.set("host", "192.168.0.13");
-    //app.set("port", "3030");
-    //app.use(express.static('./example'));
-    //const server = app.listen("3030", "192.168.0.13");
-    console.log(process.env.PORT)
-});
- */
-
-
-
 
 
 
@@ -91,6 +77,30 @@ gulp.task('package', ()=> {
     });
 
 
+
+});
+
+
+gulp.task('web', () => {
+
+    return new Promise(async (resolve) => {
+
+        const bundle = await rollup.rollup({input: "./src/shifter.js"})
+            .catch((err) => {
+                console.log(err)
+            });
+
+        if (bundle) await bundle.write({
+            format: "umd", // required
+            //format: "esm", // required
+            file: "./build/umd/shifter.js",
+            name: "shifter", // exposed name of the lib.
+            exports: "named",
+            globals: "window"
+        });
+        bSync.reload({stream: false});
+        resolve();
+    });
 
 });
 

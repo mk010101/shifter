@@ -7,7 +7,7 @@ export default class Pan_X extends Action {
     constructor(target, transforms) {
 
         super(target, transforms);
-
+        this.name = "pan_x";
         this._detectPanDist = 10;
         this._isPanningX = false;
         this._canPan = true;
