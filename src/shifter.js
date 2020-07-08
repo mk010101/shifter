@@ -59,6 +59,13 @@ export default class Shifter extends Dispatcher {
         this._setTransforms();
     }
 
+    reset() {
+        for (let i = 0; i < this._funcs.length; i++) {
+            this._funcs[i].reset();
+            this._setTransforms();
+        }
+    }
+
     _setProp(func, prop, value) {
 
         for (let i = 0; i < this._funcs.length; i++) {

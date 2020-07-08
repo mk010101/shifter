@@ -92,10 +92,9 @@
         shifter.setMaxZoom(2);
         shifter.setZoom(4);
 
-        shifter.on(Shifter.Evt.CLICK, e => {});
-        //shifter.on(Shifter.Evt.PAN_END, e => console.log("pan end"));
-
-
+        shifter.on(Shifter.Evt.CLICK, e => {
+            shifter.reset();
+        });
 
     }
 

@@ -59,6 +59,10 @@
             this._pointers = [];
         }
 
+        reset() {
+            this.transforms = [1, 0, 0, 1, 0, 0];
+        }
+
         updateTransforms(transforms) {
             this.transforms = transforms;
         }
@@ -525,6 +529,13 @@
         setZoom(value) {
             this._setProp(Zoom, "zoom", value);
             this._setTransforms();
+        }
+
+        reset() {
+            for (let i = 0; i < this._funcs.length; i++) {
+                this._funcs[i].reset();
+                this._setTransforms();
+            }
         }
 
         _setProp(func, prop, value) {
