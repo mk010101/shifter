@@ -12,7 +12,7 @@ export default class Action {
     }
 
     reset() {
-        this.transforms = [1, 0, 0, 1, 0, 0];
+
     }
 
     updateTransforms(transforms) {

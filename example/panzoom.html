@@ -92,6 +92,8 @@
         shifter.setMaxZoom(2);
         shifter.setZoom(4);
 
+        shifter.reset();
+
         shifter.on(Shifter.Evt.CLICK, e => {
             shifter.reset();
             //shifter.enabled = false;

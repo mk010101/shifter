@@ -12,6 +12,13 @@ export default class Pan extends Action {
 
     }
 
+    reset() {
+        this.transforms[4] = 0;
+        this.transforms[5] = 0;
+        this._x0 = 0;
+        this._y0 = 0;
+    }
+
 
     onDown(e) {
         super.onDown(e);

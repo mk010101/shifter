@@ -60,7 +60,7 @@
         }
 
         reset() {
-            this.transforms = [1, 0, 0, 1, 0, 0];
+
         }
 
         updateTransforms(transforms) {
@@ -114,6 +114,13 @@
             this._x0 = transforms[4];
             this._y0 = transforms[5];
 
+        }
+
+        reset() {
+            this.transforms[4] = 0;
+            this.transforms[5] = 0;
+            this._x0 = 0;
+            this._y0 = 0;
         }
 
 
@@ -235,6 +242,13 @@
             this._scale = transforms[0];
         }
 
+
+        reset() {
+            //this._scale = this.transforms[0];
+            this.transforms[0] = 1;
+            this.transforms[3] = 1;
+            this._scale = 1;
+        }
 
         onDown(e) {
             super.onDown(e);

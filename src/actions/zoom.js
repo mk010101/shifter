@@ -16,6 +16,13 @@ export default class Zoom extends Action {
     }
 
 
+    reset() {
+        //this._scale = this.transforms[0];
+        this.transforms[0] = 1;
+        this.transforms[3] = 1;
+        this._scale = 1;
+    }
+
     onDown(e) {
         super.onDown(e);
     }
