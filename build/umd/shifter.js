@@ -511,6 +511,7 @@
             this._disabled = false;
             this._isPassiveEvt = true;
             this._prevTransforms = [];
+            this._enabled = true;
 
             this._manager = new Recognizer(target);
 
@@ -536,6 +537,10 @@
                 this._funcs[i].reset();
                 this._setTransforms();
             }
+        }
+
+        set enabled (value) {
+            this._enabled = value;
         }
 
         _setProp(func, prop, value) {
@@ -589,6 +594,8 @@
 
         _pDown(e) {
 
+            if (!this._enabled) return;
+
             let tr = this._parseTargetTransforms();
 
             for (let i = 0; i < this._funcs.length; i++) {
@@ -607,6 +614,8 @@
 
         _pMove(e) {
 
+            if (!this._enabled) return;
+
             for (let i = 0; i < this._funcs.length; i++) {
                 this._funcs[i].onMove(e);
             }
@@ -618,6 +627,8 @@
 
 
         _pUp(e) {
+
+            if (!this._enabled) return;
 
             for (let i = 0; i < this._funcs.length; i++) {
                 this._funcs[i].onUp(e);
@@ -647,6 +658,8 @@
 
         _pCancelled(e) {
 
+            if (!this._enabled) return;
+
             this._manager.onCancelled(e);
 
             for (let i = 0; i < this._funcs.length; i++) {
@@ -660,6 +673,8 @@
         }
 
         _onWheel(e) {
+
+            if (!this._enabled) return;
 
             this._manager.onWheel(e);
 
